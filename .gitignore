@@ -1,0 +1,33 @@
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+Desktop.ini
+*.lnk
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.nfs*
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.tmp
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS generated
+.SysInfo
