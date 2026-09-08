@@ -5,6 +5,7 @@ Desktop.ini
 Desktop.ini
 *.lnk
 $RECYCLE.BIN/
+git-push.bat
 
 # macOS
 .DS_Store
