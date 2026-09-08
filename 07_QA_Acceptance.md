@@ -32,6 +32,9 @@
 - Кросс-проектный поиск находит документ в другом проекте через реестр
 - Дедупликация внутри проекта работает (один документ — один файл)
 - Реестр синхронизируется при записи документа
+- Отсутствие доступа между Project (A-09): наличие записи в реестре не даёт доступ к содержимому другого проекта
+- Stale registry (Q-01): отставание реестра — допустимое состояние; восстановимость проверяется через outbox reconciliation
+- Повтор запроса/цитаты в другом Study не раскрывает чужие данные (A-04)
 
 ---
 
@@ -69,7 +72,8 @@
 - content hash;
 - near-duplicate content;
 - copied/reprinted materials;
-- `SourceRelation` (COPY, REWRITE, CITATION, SAME_PRIMARY).
+- `SourceRelation` (COPY, REWRITE, CITATION, SAME_PRIMARY);
+- одно очищенное тело документа (A-08): тест «5 копий одного документа → 1 тело + 5 записей DocumentSourceOccurrence»; первоначальный `source_id` не является полным списком происхождений.
 
 ---
 
@@ -112,6 +116,8 @@ MVP должен работать CPU-only.
 
 **Критерий приёмки:** Recall не ниже 0.9 для каждого тестового запроса.
 
+Морфология обязательна для MVP (A-13): полная морфологическая обработка русского языка является обязательным требованием MVP, а не опцией «если включена». Упрощённый BasicNormalizer допускается только как явно диагностируемый degraded fallback — попадание системы в degraded fallback фиксируется в логах и диагностике и не маскируется тестами.
+
 ---
 
 ## 8. Chunking
@@ -125,7 +131,11 @@ MVP должен работать CPU-only.
 - overlap_group_id;
 - is_overlap flag;
 - numeric signatures;
-- reproducibility.
+- reproducibility;
+- полуоткрытые интервалы `[char_start, char_end)` (A-06);
+- повторяемость: повторный чанкинг того же документа даёт идентичные chunk_id (A-07);
+- согласованность chunk_id между версиями разбиения: смена версии chunker не ломает существующие chunk_id (A-07);
+- недвоение: overlap-части контекстного коридора не дублируется при склейке (A-06).
 
 ---
 
@@ -136,7 +146,8 @@ MVP должен работать CPU-only.
 - chunk relation (target + context);
 - location;
 - source relation;
-- duplicate evidence prevention через `evidence_hash`;
+- duplicate evidence prevention через каноническую проверку (A-05): Study + версия Document + полуоткрытый интервал `[char_start, char_end)` + точный текст; `evidence_hash` — совместимый контракт;
+- тест: одна цитата из двух overlap-targets учитывается один раз (A-05/A-06);
 - правило: контекстный чанк (is_target=FALSE) не является самостоятельным Evidence.
 
 ---
@@ -200,6 +211,8 @@ MVP должен работать CPU-only.
 
 Система не должна считать количество URL количеством независимых подтверждений. Подсчёт должен опираться на `SourceRelation` и консервативное правило для `UNKNOWN`.
 
+Нормируемое требование (Q-02): подсчёт выполняется по формуле `independent_source_count(claim)` на уровне Claim — provenance-кластеры, не являющиеся COPY/REWRITE/SAME_PRIMARY, не являющиеся зависимыми CITATION и не имеющие UNKNOWN relation. Связь одного Claim не делает весь Source зависимым для всех Claims. При недостатке данных — `INSUFFICIENT_EVIDENCE`, без искусственного увеличения confidence.
+
 ---
 
 ## 15. Adaptive Search
@@ -231,7 +244,10 @@ MVP должен работать CPU-only.
 - miss;
 - expired;
 - forced refresh;
-- source-specific TTL.
+- source-specific TTL;
+- cache hit не потребляет `network`/`fetch` budget (Q-04).
+
+Жизненный цикл данных (A-21): удаление Study не удаляет общий Document; обновление URL создаёт новую версию Document (обновление URL в существующем Document — блокер Q-08, открыт).
 
 ---
 
@@ -243,7 +259,12 @@ MVP должен работать CPU-only.
 - rollback;
 - recovery;
 - сохранность состояния после сбоя;
-- применение PRAGMA на каждом подключении через фабрику.
+- применение PRAGMA на каждом подключении через фабрику;
+- durability-режим (A-11): валидация `PRAGMA synchronous=FULL` для соединений записи; backup через SQLite Backup API; мониторинг WAL/свободного места.
+
+Бюджетные тесты (Q-04, раздел 5.5 УИ / BUDGET CONTRACT v1.0): конкурентная reservation, rollback после ошибки, retry network, cache hit, timeout LLM, missing token usage, pause/resume time, zero budget, explicit extension, duplicate operation, crash после reserve и recovery reconciliation; отрицательные и конкурентные сценарии обязательны.
+
+Outbox-тесты (Q-01): crash между project commit и registry apply; повтор event; registry отстаёт; повреждённый payload; два проекта с одним hash; восстановление outbox.
 
 ---
 
@@ -269,6 +290,8 @@ MVP должен работать CPU-only.
 
 **Критерий приёмки:** Ни один сценарий не приводит к нарушению протокола или падению MCP-клиента.
 
+CI policy (A-20): CI запрещает `print`/`sys.stdout.write` вне разрешённых мест (static check); обнаружение debug-вывода на transport-уровне является ошибкой теста.
+
 ---
 
 ## 20. LLM resilience
@@ -285,7 +308,9 @@ MVP должен работать CPU-only.
 - сохранение State;
 - `SESSION_RESUMING`;
 - отсутствие потери Evidence/Claims;
-- корректный пересчёт `TokenBudgetManager` при смене бэкенда.
+- корректный пересчёт `TokenBudgetManager` при смене бэкенда;
+- backend switch не меняет business thresholds и историю Study (A-18);
+- восстановление не меняет правила достаточности (A-18).
 
 ---
 
@@ -326,6 +351,8 @@ MVP должен работать CPU-only.
 3. **Перестроение индекса (Job):** Запуск перестроения BM25-индекса, запрос отмены через `cancel_job`. Операция обязана быть отменена через Job-механизм.
 
 **Критерий приёмки:** Все сценарии завершаются в пределах таймаута, консистентность SQLite сохранена, частичные результаты не потеряны.
+
+Дополнительно (A-14): отсутствие unsafe thread kill во всех сценариях отмены; поздние результаты отменённых операций не записываются в БД; неотменяемые CPU-библиотеки выполняются в дочернем процессе без DB-write.
 
 ---
 
@@ -381,7 +408,12 @@ MVP должен работать CPU-only.
 - LLM restart не уничтожает Study;
 - Hard Stop не повреждает SQLite (кооперативная отмена);
 - локальные документы не передаются внешним LLM;
-- MCP stdout защищён от случайного вывода.
+- MCP stdout защищён от случайного вывода;
+- acceptance выполняется на фикстурах/FakeLLM без семантического извлечения реальной LLM (A-16, раздел 28);
+- FSM-матрица переходов проверяется целиком по STATE MACHINE SPECIFICATION v1.2, включая дополнения Q-05 (READY→PLANNING по EDIT_PLAN, USER_STOPPED→FINALIZING по FINALIZE_PARTIAL, SearchTask/Job отмены);
+- SufficiencyEvaluator воспроизводит golden decisions по базовому strategy profile EVIDENCE (Q-03);
+- outbox-синхронизация Project DB → registry.db проходит тест-минимум Q-01;
+- бюджетные тесты BUDGET CONTRACT v1.0 (§5.5 УИ v1.0) проходят целиком (Q-04).
 
 ---
 
