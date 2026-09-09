@@ -407,6 +407,8 @@ MCP не имеет права самостоятельно:
 
 **Подэтапы:** application shell; project/study creation; project switching через Project Registry; Intent Blueprint; X-Ray Activity Stream; Evidence Explorer/Tree; Report Viewer; Dashboard/Health; Snapshot/Offline; Review/Aggregation UI; cooperative cancellation.
 
+**Кооперативная отмена (A-14):** применяется в GUI-слое — cancellation token + ограниченные батчи; unsafe thread kill запрещён; неотменяемые CPU-библиотеки выносятся в дочерний процесс без DB-write (см. раздел 6 ТЗ, §9 и раздел 4 ТЗ, §28).
+
 **Правило:** Main Thread не выполняет тяжёлый retrieval, parsing, indexing или orchestration.
 
 **Gate G-08:** GUI не содержит бизнес-правил; worker независим; UI остаётся отзывчивым; soft/hard stop, offline, snapshot и Evidence traceability работают.

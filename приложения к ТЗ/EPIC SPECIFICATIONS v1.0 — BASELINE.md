@@ -64,6 +64,14 @@ LogRecord
 Job
 ```
 
+Нормализованные таблицы (A-03): `EntityAlias`, `IntentEntity`, `IntentInformationNeed`, `IntentConstraint`, `IntentSourcePreference`, `IntentOutputRequirement`, `SourceIdentifier`, `SearchResultIdentifier`, `ChunkNumericSignature`, `DocumentSourceOccurrence`, `SourceQualityAssessment`, `SufficiencyMetric`, `SufficiencyRuleHit`, `BudgetLimit`, `BudgetCounter`, `BudgetReservation`, `BudgetLedger`, `OutboxEvent`.
+
+Стабильные идентификаторы (A-07): `DocumentChunk.chunk_id` детерминирован относительно document identity + версии chunker + позиции; смена версии разбиения (chunk_size/параметры) не ломает существующую доказательную базу — новые версии разбиения создают новые chunk_id без перезаписи существующих.
+
+Синхронизация реестра (Q-01): Project DB — источник истины; registry.db синхронизируется через transactional outbox (событие в той же транзакции + идемпотентный Registry Writer + reconciliation); мультифайловый snapshot не объявляется crash-atomic.
+
+Durability (A-11): `synchronous=FULL` для записи, `foreign_keys=ON` на каждом соединении, backup через SQLite Backup API, мониторинг WAL/свободного места.
+
 Схема должна быть архитектурно готова к FTS5/BM25 для DocumentChunk.
 
 Прямое копирование активной SQLite DB запрещено. Backup/snapshot выполняется штатным backup/checkpoint механизмом.
