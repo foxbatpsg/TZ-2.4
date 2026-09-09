@@ -3,7 +3,7 @@
 **Проект:** Research Prompt Suite  
 **База:** утверждённое ТЗ v2.4  
 **Статус:** Development Planning Baseline / Candidate Freeze  
-**Версия:** 1.1  
+**Версия:** 1.2 (A-01: версия трактуется как 1.2)  
 **Назначение:** верхнеуровневая карта разработки. Не заменяет ТЗ, State Machine Specification, MCP Tool Contracts и будущие EPIC/TASK-документы.
 
 ---
@@ -157,6 +157,12 @@ QA выполняется параллельно каждому EPIC.
 
 **Ключевые сущности:** Project, Study, ResearchIntent, ResearchSession, SearchTask, SearchResult, Source, SourceRelation, Entity, Document, DocumentChunk, StudyDocumentLink, Evidence, EvidenceContextChunk, Observation, Claim, ClaimEvidence, Contradiction, ResearchGap, SufficiencyEvaluation, ResearchConfig, ResearchState, WorkingMemory, CacheEntry, LogRecord, Job.
 
+**Нормализованные таблицы (A-03):** EntityAlias, IntentEntity, IntentInformationNeed, IntentConstraint, IntentSourcePreference, IntentOutputRequirement, SourceIdentifier, SearchResultIdentifier, ChunkNumericSignature, DocumentSourceOccurrence, SourceQualityAssessment, SufficiencyMetric, SufficiencyRuleHit, BudgetLimit, BudgetCounter, BudgetReservation, BudgetLedger, OutboxEvent — реализуются в EPIC-02.
+
+**Синхронизация с реестром (Q-01):** Project DB — источник истины; синхронизация registry.db выполняется через transactional outbox (OutboxEvent в той же транзакции + идемпотентный Registry Writer + reconciliation). Snapshot manifest не является crash-atomic; восстановление проверяет manifest и выполняет outbox reconciliation.
+
+**Durability (A-11):** synchronous=FULL для записи, foreign_keys=ON на каждом соединении, backup через SQLite Backup API, мониторинг WAL/свободного места.
+
 ### Требование FTS5/BM25 readiness
 
 Схема и persistence layer должны быть архитектурно совместимы с последующей FTS5/BM25-индексацией `DocumentChunk`.
@@ -235,6 +241,10 @@ RetrievalTextNormalizer
 - выбор tokenizer должен подтверждаться тестами/benchmark на целевом корпусе;
 - fallback на BasicTokenizer должен быть допустимым и явно диагностируемым.
 
+Примечание (A-01): пропуски номеров подэтапов (8, 10) в списке EPIC-04 — техническое следствие нумерации, а **не отсутствующие требования**.
+
+Границы ответственности (A-16): EPIC-04 предоставляет чистые типизированные primitives (coverage, sufficiency, budget); EPIC-05 вызывает их и не реализует второй evaluator.
+
 Не следует фиксировать в Roadmap конкретный Python API или конкретный morphology engine до проверки совместимости с целевой SQLite/FTS5 реализацией.
 
 **Gate G-04:** проходит полный CPU-only pipeline
@@ -271,6 +281,8 @@ Question → ResearchIntent → Analysis Strategy → Research Plan
 Новые SearchTask создаются только через предусмотренный механизм ResearchGap → planning → Core validation.
 
 Core остаётся владельцем task acceptance, duplicate/similar query checks, budget, coverage, sufficiency и execution.
+
+A-16: Research Engine вызывает typed primitives EPIC-04 (coverage/sufficiency/budget) и не реализует второй SufficiencyEvaluator. G-04 проверяется на fixtures без реальной LLM, G-05 — через FakeLLM.
 
 **Gate G-05:** mock-LLM end-to-end цикл `intent → plan → tasks → retrieval → evidence → gap → next task → sufficiency → finalize` проходит. Решение о завершении принимает Core.
 
@@ -419,7 +431,7 @@ GUI → Application/Core → Research Engine → MCP/LLM → Search Core → Dat
 
 **Уровни:** Unit → Component → Integration → FSM → MCP Contract → E2E → Failure Scenarios → Acceptance.
 
-**Обязательные области:** data isolation, BM25, tokenizer, Russian morphology если включена, deterministic chunking, overlap protection, FTS5/index consistency, evidence_hash, aggregation, claims, contradictions, primary source, context protection, LLM resilience, structured JSON validation, GUI responsiveness, cooperative cancellation, network resilience, security, MATERIALS_ONLY, offline, CPU-only.
+**Обязательные области:** data isolation, BM25, tokenizer, Russian morphology (обязательна для MVP — A-13; Acceptance морфологии — обязательный критерий G-10), deterministic chunking, overlap protection, FTS5/index consistency, evidence_hash, aggregation, claims, contradictions, primary source, context protection, LLM resilience, structured JSON validation, GUI responsiveness, cooperative cancellation, network resilience, security, MATERIALS_ONLY, offline, CPU-only.
 
 **Gate G-10:** все обязательные критерии Раздела 07 ТЗ выполнены; критических известных дефектов нет.
 
@@ -449,7 +461,7 @@ GUI → Application/Core → Research Engine → MCP/LLM → Search Core → Dat
 | 02 Data Layer | 01 | 03, 04, 05 |
 | 03 State Machines | 02 | 04, 05, 06, 07 |
 | 04 Search Core | 02, 03 | 05, 07, 08 |
-| 05 Research Engine | 03, 04 | 06, 07, 08 |
+| 05 Research Engine | 03, 04 | 07, 08 |
 | 06 LLM Backend | 01, 03 | 07, 09 |
 | 07 MCP | 03, 04, 05, 06 | 08, 09 |
 | 08 GUI | 02, 03, 04, 05, 07 | 09 |
@@ -528,12 +540,13 @@ Gate
 
 При разработке приоритет следующий:
 
-1. утверждённое ТЗ v2.4;
-2. `STATE MACHINE SPECIFICATION v1.1`;
-3. `MCP TOOL CONTRACTS v1.1`;
-4. EPIC-документ текущего этапа;
-5. TASK текущего этапа;
-6. код и существующие тесты.
+1. утверждённое ТЗ v2.4 + утверждённые изменения (УИ v1.0: A-01…A-21, Q-01…Q-05);
+2. `STATE MACHINE SPECIFICATION v1.2`;
+3. `BUDGET CONTRACT v1.0`;
+4. `MCP TOOL CONTRACTS v1.1` (до выпуска v1.2);
+5. EPIC-документ текущего этапа;
+6. TASK текущего этапа;
+7. код и существующие тесты.
 
 Нижестоящий документ не имеет права самостоятельно переопределять вышестоящий.
 
@@ -554,6 +567,14 @@ Gate
 9. EPIC-07 дополнен автоматическим stdout transport contract test.
 10. EPIC-08 дополнен cooperative cancellation и project switching через Project Registry.
 11. Dependency Matrix исправлена.
+
+По применению УИ v1.0 (A-01…A-21, Q-01…Q-05):
+
+12. Версия документа трактуется как 1.2 (A-01); пропуски пунктов 8/10 в EPIC-04 — не отсутствующие требования; ребро EPIC-05 → EPIC-06 в Dependency Matrix удалено (A-01).
+13. EPIC-02 дополнен нормализованными таблицами (A-03), outbox-синхронизацией реестра (Q-01) и durability-гарантиями (A-11).
+14. EPIC-04/EPIC-05 разведены по typed primitives (A-16); G-04 — fixtures без LLM, G-05 — FakeLLM.
+15. Acceptance морфологии — обязательный критерий G-10 (A-13).
+16. Нормативные источники переведены на FSM v1.2 и BUDGET CONTRACT v1.0.
 
 ---
 

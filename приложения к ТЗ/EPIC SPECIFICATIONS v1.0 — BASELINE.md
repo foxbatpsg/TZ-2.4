@@ -119,6 +119,8 @@ RetrievalTextNormalizer
 
 **Gate G-04:** retrieval детерминирован; deduplication и query fingerprint работают; FTS5/BM25 согласован с DocumentChunk; lifecycle индекса корректен; evidence provenance, budget, cache и normalizer versioning работают.
 
+Граница ответственности (A-16): EPIC-04 предоставляет чистые типизированные primitives (coverage, sufficiency, budget); второй evaluator в других эпиках не реализуется. G-04 проверяется на fixtures без реальной LLM.
+
 ---
 
 ## 6. EPIC-05 — RESEARCH ENGINE
@@ -132,6 +134,8 @@ Core владеет task acceptance, duplicate/similar query checks, budget, cov
 Новые SearchTask: `ResearchGap → planning → Core validation → SearchTask`.
 
 **Gate G-05:** mock-LLM E2E проходит `intent → plan → tasks → retrieval → evidence → gap → next task → sufficiency → finalize`.
+
+Примечание (A-16): Research Engine вызывает typed primitives EPIC-04 и не реализует второй SufficiencyEvaluator; G-05 проверяется через FakeLLM. Примечание (A-01): архитектурной зависимости EPIC-06 от EPIC-05 нет; gated-порядок сохраняется.
 
 ---
 

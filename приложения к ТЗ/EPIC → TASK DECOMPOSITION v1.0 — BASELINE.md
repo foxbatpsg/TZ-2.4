@@ -2,7 +2,7 @@
 
 **Проект:** Research Prompt Suite  
 **Статус:** Draft for TASK generation  
-**Основание:** ТЗ v2.4; State Machine Specification; MCP Tool Contracts; MASTER DEVELOPMENT ROADMAP; EPIC SPECIFICATIONS v1.0 — BASELINE; TASK EXECUTION CONTRACT v1.0 — BASELINE.
+**Основание:** ТЗ v2.4 + УИ v1.0 (A-01…A-21, Q-01…Q-05); State Machine Specification v1.2; BUDGET CONTRACT v1.0; MCP Tool Contracts v1.1 (до выпуска v1.2); MASTER DEVELOPMENT ROADMAP; EPIC SPECIFICATIONS v1.0 — BASELINE; TASK EXECUTION CONTRACT v1.0 — BASELINE.
 
 # 1. Назначение
 
@@ -265,6 +265,8 @@ CODE / TEST / REVIEW
 ---
 
 # 7. EPIC-05 — RESEARCH ENGINE
+
+Примечание (A-01): архитектурной зависимости EPIC-06 от EPIC-05 нет; фактический gated-порядок сохраняется. Примечание (A-16): EPIC-05 вызывает typed primitives EPIC-04 (coverage/sufficiency/budget, группы R8–R9) и не реализует второй SufficiencyEvaluator; G-05 проверяется через FakeLLM.
 
 ### Group RE1 — Research configuration
 

@@ -11,7 +11,8 @@ TASK Execution Contract определяет границу полномочий
 выполнении одной TASK.
 
 Контракт применяется к каждой изолированной TASK и является операционным
-дополнением к ТЗ, State Machine Specification, MCP Tool Contracts,
+дополнением к ТЗ, Утверждённым изменениям v1.0 (A-01…A-21, Q-01…Q-05),
+State Machine Specification v1.2, BUDGET CONTRACT v1.0, MCP Tool Contracts,
 MASTER DEVELOPMENT ROADMAP, EPIC Specification и конкретной TASK.
 
 Контракт не изменяет требования этих документов.
