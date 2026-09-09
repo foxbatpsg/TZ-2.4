@@ -6,6 +6,7 @@ Desktop.ini
 *.lnk
 $RECYCLE.BIN/
 git-push.bat
+корзина/
 
 # macOS
 .DS_Store
