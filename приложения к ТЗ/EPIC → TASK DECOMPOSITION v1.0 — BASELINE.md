@@ -679,7 +679,3 @@ EPIC-11
 
 **Конец EPIC → TASK DECOMPOSITION v1.0 — BASELINE**
 
-```
-
-Следующим шагом берем **E01-T01 → E01-T14** и превращаем их в полноценные TASK по `TASK EXECUTION CONTRACT v1.0`.
-```
