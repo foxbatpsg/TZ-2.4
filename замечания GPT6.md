@@ -375,6 +375,8 @@ Budget exhausted → FINALIZING → COMPLETED с PARTIAL виден в GUI и к
 
 ## S-16 [P2] Расширить Context Header для Cline / OpenCode
 
+> **Статус: частично выполнено (2026-09-14).** Поле `BASELINE_ID` внесено решением по `S-09` в `TASK EXECUTION CONTRACT v1.0` §4. Осталось из этого замечания: `RELATED_ADR` (с явным `NONE`), `BLOCKED_BY`, подтверждение лимита repair-цикла. См. `REVIEW-REGISTRY.md` §4 п. `S-16`.
+
 Источник: приложения к ТЗ/TASK EXECUTION CONTRACT v1.0 — BASELINE.md · §4 · STOP → REPORT
 
 ### Наблюдение
