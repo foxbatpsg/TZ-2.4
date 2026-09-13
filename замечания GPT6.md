@@ -341,6 +341,8 @@ Budget exhausted → FINALIZING → COMPLETED с PARTIAL виден в GUI и к
 
 ## S-14 [P2] Добавить матрицу ТЗ → EPIC → Gate
 
+> **Статус: `ACCEPT` ✅ внесено 2026-09-14** → `INDEX.md` §7 (колонки `TASK`, `ADR` + ADR-контур) и §6 (колонка `Fixtures`); валидатор в CI — `07` §27.1. Отдельный `TRACEABILITY.md` не создавался. См. `REVIEW-REGISTRY.md` §1 п. `S-14`.
+
 Источник: приложения к ТЗ/MASTER DEVELOPMENT ROADMAP v1.2 — BASELINE.md · Roadmap · G-01…G-11
 
 ### Наблюдение
