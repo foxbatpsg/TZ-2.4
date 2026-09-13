@@ -443,7 +443,9 @@ GUI → Application/Core → Research Engine → MCP/LLM → Search Core → Dat
 
 **Цель:** эксплуатационный MVP.
 
-**Включает:** portable folder, configuration, local DB handling, environment checker, dependency diagnostics, administrator diagnostic token, startup checks, logging, backup/recovery instructions.
+**Включает:** portable folder, configuration, local DB handling, environment checker, dependency diagnostics, startup checks, logging, backup/recovery instructions.
+
+**Исключено из MVP (`Q-13`):** privileged administrator diagnostic token — локальная диагностика работает без скрытого привилегированного доступа; будущий механизм — только отдельным архитектурным решением с полным контрактом.
 
 **Не входит в MVP:** полноценный Android runtime, отдельный Linux UX, embeddings, vector DB, reranker.
 

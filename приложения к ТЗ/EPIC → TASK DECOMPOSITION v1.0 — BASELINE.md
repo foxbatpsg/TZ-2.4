@@ -565,7 +565,7 @@ CODE / TEST / REVIEW
 * **E11-T06** — dependency/component check.
 * **E11-T07** — permissions/filesystem check.
 * **E11-T08** — SQLite health check.
-* **E11-T09** — administrator diagnostic token.
+* **~~E11-T09~~** — ~~administrator diagnostic token~~. **Снято из MVP (`Q-13`, 2026-09-13):** privileged administrator diagnostic token не вводится. Привилегированная/удалённая диагностика — только отдельным архитектурным решением с полным контрактом (выдача, область полномочий, срок, хранение, отзыв, аудит). ID `E11-T09` не переиспользуется.
 * **E11-T10** — user-facing diagnostics.
 
 ### Group P3 — Backup/recovery

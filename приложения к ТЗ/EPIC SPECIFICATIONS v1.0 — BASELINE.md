@@ -235,9 +235,11 @@ GUI → Application/Core → Research Engine → MCP/LLM → Search Core → Dat
 
 **Purpose:** эксплуатационный portable MVP.
 
-**Scope:** portable folder, configuration, local DB handling, environment checker, dependency diagnostics, administrator diagnostic token, startup checks, logging, backup/recovery instructions.
+**Scope:** portable folder, configuration, local DB handling, environment checker, dependency diagnostics, startup checks, logging, backup/recovery instructions.
 
 Environment checker проверяет runtime, компоненты, права, filesystem requirements и состояние локальной БД. При проблеме выдаёт понятную диагностику и информацию для администратора.
+
+**Исключено из MVP (`Q-13`):** privileged administrator diagnostic token. Локальная диагностика работает без специального скрытого доступа. Любой будущий привилегированный/удалённый механизм диагностики вводится отдельным архитектурным решением с полным контрактом (кто выдаёт, кто использует, срок действия, область полномочий, хранение, отзыв, аудит) — `Q-13` (закрыт 2026-09-13).
 
 **MVP non-goals:** полноценный Android runtime, отдельный Linux UX, embeddings, vector DB, reranker. Нет скрытых обязательных GPU/vector dependencies.
 
