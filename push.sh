@@ -15,8 +15,33 @@
 
 set -u
 
+# --- защита от запуска через WSL-bash ---
+# В Windows есть три bash.exe; WSL-версия не видит git/awk и падает с 127.
+case "$(uname -s 2>/dev/null || echo unknown)" in
+  MINGW*|MSYS*|CYGWIN*) : ;;   # Git Bash — то, что нужно
+  Linux)
+    if [ -n "${WSL_DISTRO_NAME:-}" ] || grep -qi microsoft /proc/version 2>/dev/null; then
+      echo "ОШИБКА: скрипт запущен через WSL-bash, а нужен Git Bash." >&2
+      echo "WSL не видит Windows-пути и git этого репозитория." >&2
+      echo "Запускайте через push.bat либо: \"C:\\Program Files\\Git\\bin\\bash.exe\" push.sh" >&2
+      exit 127
+    fi
+    ;;
+esac
+
+# --- проверка, что git вообще доступен (иначе 127 будет невнятным) ---
+if ! command -v git >/dev/null 2>&1; then
+  echo "ОШИБКА: git не найден в PATH. Возможно, выбран не тот bash." >&2
+  exit 127
+fi
+
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 REMOTE="origin"
+
+if [ -z "$BRANCH" ] || [ "$BRANCH" = "HEAD" ]; then
+  echo "ОШИБКА: не удалось определить текущую ветку (detached HEAD?)." >&2
+  exit 1
+fi
 
 # --- шаг 1: опциональный коммит ---
 if [ "${1:-}" = "-m" ]; then
@@ -39,7 +64,10 @@ if ! git push "$REMOTE" "$BRANCH"; then
 fi
 
 # --- шаг 3: самовосстановление ref ---
-REMOTE_SHA="$(git ls-remote "$REMOTE" "refs/heads/$BRANCH" 2>/dev/null | awk '{print $1}')"
+# Без awk: `git ls-remote` возвращает "<sha>\t<ref>", берём первое поле
+# через параметрное развёртывание — работает в любом sh/bash.
+REMOTE_LINE="$(git ls-remote "$REMOTE" "refs/heads/$BRANCH" 2>/dev/null | head -n 1)"
+REMOTE_SHA="${REMOTE_LINE%%[[:space:]]*}"
 LOCAL_SHA="$(git rev-parse HEAD)"
 
 if [ -z "$REMOTE_SHA" ]; then

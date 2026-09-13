@@ -11,6 +11,15 @@ rem   из-за которого после push git status врёт "upstream i
 rem   Двойной щелчок по .sh в Windows не работает — этот батник
 rem   вызывает bash и прокидывает все аргументы.
 rem
+rem   !!! ВАЖНО: в Windows есть ТРИ разных bash.exe:
+rem     1. C:\Windows\System32\bash.exe        — WSL-лаунчер (НЕ подходит!)
+rem     2. ...\WindowsApps\bash.exe            — WSL-стаб  (НЕ подходит!)
+rem     3. C:\Program Files\Git\bin\bash.exe   — Git Bash  (НУЖЕН ЭТОТ)
+rem   Если выбрать WSL-bash, он не найдёт git/awk -> код 127.
+rem   Поэтому здесь мы идём по явным путям Git for Windows, а
+rem   `where bash` используется лишь как последний шанс и с
+rem   фильтром, отсекающим System32 и WindowsApps.
+rem
 rem   Использование:
 rem     push                     - push текущей ветки
 rem     push -m "сообщение"      - add + commit + push + починка ref
@@ -18,24 +27,32 @@ rem ============================================================
 
 setlocal
 
-rem --- шаг 1: найти bash ---
-rem ВАЖНО: в C:\Program Files\Git\cmd лежит только git.exe, bash.exe там НЕТ.
-rem Поэтому сначала пробуем `where`, затем явные пути Git for Windows.
+rem --- шаг 1: найти ИМЕННО Git Bash (не WSL) ---
 set "BASH="
 
-for /f "delims=" %%i in ('where bash 2^>nul') do (
-    if not defined BASH set "BASH=%%i"
-)
-
-if not defined BASH if exist "%ProgramFiles%\Git\bin\bash.exe" set "BASH=%ProgramFiles%\Git\bin\bash.exe"
-if not defined BASH if exist "%ProgramFiles%\Git\usr\bin\bash.exe" set "BASH=%ProgramFiles%\Git\usr\bin\bash.exe"
-if not defined BASH if exist "%ProgramFiles(x86)%\Git\bin\bash.exe" set "BASH=%ProgramFiles(x86)%\Git\bin\bash.exe"
+if exist "%ProgramFiles%\Git\bin\bash.exe"            set "BASH=%ProgramFiles%\Git\bin\bash.exe"
+if not defined BASH if exist "%ProgramFiles%\Git\usr\bin\bash.exe"      set "BASH=%ProgramFiles%\Git\usr\bin\bash.exe"
+if not defined BASH if exist "%ProgramFiles(x86)%\Git\bin\bash.exe"     set "BASH=%ProgramFiles(x86)%\Git\bin\bash.exe"
 if not defined BASH if exist "%LOCALAPPDATA%\Programs\Git\bin\bash.exe" set "BASH=%LOCALAPPDATA%\Programs\Git\bin\bash.exe"
+if not defined BASH if exist "%USERPROFILE%\scoop\apps\git\current\bin\bash.exe" set "BASH=%USERPROFILE%\scoop\apps\git\current\bin\bash.exe"
+
+rem Последний шанс: `where bash`, но только если путь НЕ ведёт в WSL/WindowsApps.
+if not defined BASH (
+    for /f "delims=" %%i in ('where bash 2^>nul') do (
+        if not defined BASH (
+            echo %%i | findstr /i /c:"\\System32\\" /c:"\\WindowsApps\\" >nul
+            if errorlevel 1 set "BASH=%%i"
+        )
+    )
+)
 
 if not defined BASH (
     echo.
-    echo ОШИБКА: bash не найден.
+    echo ОШИБКА: Git Bash не найден.
     echo Установите Git for Windows: https://git-scm.com/download/win
+    echo.
+    echo Внимание: WSL-bash из C:\Windows\System32 не подходит —
+    echo нужен именно Git Bash из состава Git for Windows.
     echo.
     pause
     exit /b 1
@@ -46,6 +63,7 @@ echo ========================================
 echo   Push для ТЗ 2.4
 echo   https://github.com/foxbatpsg/TZ-2.4
 echo ========================================
+echo   bash: %BASH%
 echo.
 
 rem --- шаг 2: проверить наличие push.sh ---
@@ -67,6 +85,13 @@ if not "%RC%"=="0" (
     echo ========================================
     echo   ОШИБКА: push завершился с кодом %RC%
     echo ========================================
+    if "%RC%"=="127" (
+        echo.
+        echo Код 127 = команда не найдена. Наиболее вероятная причина:
+        echo выбран не тот bash. Убедитесь, что используется Git Bash,
+        echo а не WSL из C:\Windows\System32.
+        echo.
+    )
     pause
     exit /b %RC%
 )
