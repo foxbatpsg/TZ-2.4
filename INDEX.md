@@ -235,6 +235,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | Reconcile / recovery | `02` §7 | — | Q-05, G-09 |
 | Partial report / FULL-PARTIAL | `05` §15; `06` §8 | STATE MACHINE SPEC §1 | **S-08** |
 | stdout protection | `05` §3.1; `07` §19.1 | — | A-20, **S-04** |
+| Post-MVP список (отложенные механизмы) | `07` §26 | — | **S-03** (хранение API-ключей, `DEFER`) |
 
 ---
 
