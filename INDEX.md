@@ -242,7 +242,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 
 | ID | Дефект | Место | Статус |
 |---|---|---|---|
-| **D-1** | `A-13` (RU-морфология обязательна) ↔ `EPIC-10` Coverage: «Russian morphology **если включена**» | `EPIC SPECIFICATIONS` стр. 228 | подтверждён, требует правки |
+| **D-1** | `A-13` (RU-морфология обязательна) ↔ `EPIC-10` Coverage: «Russian morphology **если включена**» | `EPIC SPECIFICATIONS v1.0` стр. 228 | ✅ **CLOSED** (2026-09-13) — приведено к формулировке `A-13`/`MASTER ROADMAP` §13 |
 | **D-2** | Q-06, Q-07 отсутствуют — пропуск нумерации без пояснения | весь корпус | требует пояснения (по аналогии с `MASTER ROADMAP` стр.244) |
 | **D-3** | `A-01` входил в нормативный набор «УИ v1.0» без определения | приложения, 5 примечаний | ✅ **CLOSED** (2026-09-13) — формулировка внесена в нормативный состав: `MASTER ROADMAP v1.2` §21.1. См. D-4 |
 | **D-4** | ⚠ Дубли определений: A-03 (×7), A-02/A-10/A-21/Q-04 (×4) — расхождение акцентов | `03`, `04`, `05`, `01` | требует назначения `canonical` при переходе к варианту 2 |
@@ -265,7 +265,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
     - "07_QA_Acceptance.md §7.1 стр.118"
     - "MASTER ROADMAP v1.2 стр.436, 578"
   conflicts:
-    - "EPIC SPECIFICATIONS v1.0 стр.228 — 'Russian morphology если включена'"
+    - "EPIC SPECIFICATIONS v1.0 стр.228 — ✅ исправлено 2026-09-13: «Russian morphology (обязательна для MVP, A-13)»"
   gates: [G-04, G-10]
   epics: [EPIC-04, EPIC-10]
   status: active

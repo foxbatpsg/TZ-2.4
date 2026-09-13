@@ -225,7 +225,7 @@ GUI → Application/Core → Research Engine → MCP/LLM → Search Core → Dat
 
 **Levels:** Unit → Component → Integration → FSM → MCP Contract → E2E → Failure Scenarios → Acceptance.
 
-**Coverage:** data isolation, BM25, RetrievalTextNormalizer, Russian morphology если включена, deterministic chunking, overlap protection, FTS5/index consistency, normalizer/index versioning, query fingerprint, evidence_hash, aggregation, claims, contradictions, primary source, context protection, LLM resilience, two-level structured output validation, GUI responsiveness, cooperative cancellation, project switching, network resilience, security, MATERIALS_ONLY, offline, CPU-only MVP.
+**Coverage:** data isolation, BM25, RetrievalTextNormalizer, Russian morphology (обязательна для MVP, A-13; Acceptance морфологии — обязательный критерий G-10), deterministic chunking, overlap protection, FTS5/index consistency, normalizer/index versioning, query fingerprint, evidence_hash, aggregation, claims, contradictions, primary source, context protection, LLM resilience, two-level structured output validation, GUI responsiveness, cooperative cancellation, project switching, network resilience, security, MATERIALS_ONLY, offline, CPU-only MVP.
 
 **Gate G-10:** все обязательные критерии ТЗ выполнены; критических известных дефектов нет.
 

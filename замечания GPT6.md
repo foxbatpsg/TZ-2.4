@@ -70,7 +70,7 @@ Baseline: https://github.com/foxbatpsg/TZ-2.4/tree/f15fe9ae997c7371ba1387e9537c2
 > | `S-01` | **VERIFIED / снято** в части «нужен новый EPIC» | `EPIC-11 PACKAGING / PORTABLE` уже существует со своим Gate `G-11`. Уточнять **внутри** EPIC-11. Остаточная валидность (`ACCEPT`): инструмент сборки, политика обновления, подпись |
 > | `S-02` | **VERIFIED / снято** в части «нужен ModelManager как второй компонент» | `Health Monitor` и `LLM Backend Router` уже нормативны (`05` §1–2, EPIC-06). Остаточная валидность (`ACCEPT`): preflight выбранной модели, capability-профили провайдеров |
 >
-> **Подтверждённый дефект корпуса, требующий отдельной правки:** `EPIC SPECIFICATIONS v1.0` стр. 228 (EPIC-10, Coverage) содержит «Russian morphology **если включена**», что противоречит обязательности RU-морфологии по `A-13`. См. `REVIEW-REGISTRY.md` §D-1 и `INDEX.md` §9 (дефект `D-1`).
+> **Подтверждённый дефект корпуса:** `EPIC SPECIFICATIONS v1.0` стр. 228 (EPIC-10, Coverage) содержала «Russian morphology **если включена**», что противоречило обязательности RU-морфологии по `A-13`. ✅ **ИСПРАВЛЕНО 2026-09-13** — приведено к «Russian morphology (обязательна для MVP, A-13; Acceptance морфологии — обязательный критерий G-10)». См. `REVIEW-REGISTRY.md` §D-1 и `INDEX.md` §9 (дефект `D-1`).
 >
 > **P0-блокеры** (`N-01`, `S-12`/`Q-08`, `N-02`) — оформляются как ADR; до статуса `Accepted` зависимые TASK держатся в `BLOCKED`.
 
