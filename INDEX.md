@@ -273,6 +273,21 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | — | **N-01** — MCP-host не определён | `05` §2–3 | **P0-блокер** |
 | — | **N-02** — SourceRelation UNIQUE vs `claim_id` | `03` §8a | **P0-блокер** |
 
+### 9.1. Задачи, заблокированные P0-блокерами (`S-14`)
+
+Связи зафиксированы **только там, где зависимость явно следует из названия задачи, состава группы или прямого указания реестра**. Задачи, зависимость которых неочевидна без дополнительного анализа, в список не включены.
+
+| Блокер | ADR | Заблокированные задачи | Основание |
+|---|---|---|---|
+| **N-01** — MCP-host не определён | ADR-001 | **EPIC-07 целиком** (`E07-T01…T34`), в первую очередь группа `M1 — Transport/core boundary` (`E07-T01…T05`) | `REVIEW-REGISTRY.md` §3: «Любые TASK по EPIC-05/06/07 до принятия ADR должны быть `BLOCKED`» |
+| **N-01** — MCP-host не определён | ADR-001 | EPIC-05 (`E05-T01…T28`), EPIC-06 (`E06-T01…T25`) | То же указание реестра (агентный цикл и LLM-хост — предмет ADR-001) |
+| **S-12 / Q-08** — Document identity при смене URL | ADR-002 | `E02-T10` (Document/DocumentChunk/StudyDocumentLink schema), `E02-T20` (global Document reuse) | Схема и переиспользование Document — прямой предмет конфликта `content_hash` UNIQUE |
+| **S-12 / Q-08** — Document identity при смене URL | ADR-002 | `E04-T33` (index lifecycle: document added), `E04-T34` (normalizer changed → rebuild_all), `E04-T35` (study deleted → cleanup) | Lifecycle индекса опирается на идентичность Document |
+| **N-02** — SourceRelation UNIQUE vs `claim_id` | ADR-003 | `E02-T09` (SearchTask/Source/SourceRelation/SearchResult schema), `E02-T17` (foreign keys, indexes and uniqueness constraints) | Прямой предмет конфликта UNIQUE-индекса |
+| **N-02** — SourceRelation UNIQUE vs `claim_id` | ADR-003 | `E04-T07` (SourceRelation handling) | Единственная задача, непосредственно работающая с `SourceRelation` |
+
+> `S-11` (`independent_source_count`) доопределяется после `ADR-003`, но отдельной задачи в декомпозиции не имеет — алгоритм реализуется в составе `E04-T48` (`CoverageCalculator`). Явного указания на это в задаче нет, поэтому связь не фиксируется (`S-14`, вариант «только явные связи»).
+
 ---
 
 ## 10. Задел под вариант 2 (`requirements.yaml`)
