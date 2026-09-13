@@ -143,7 +143,7 @@ Core владеет task acceptance, duplicate/similar query checks, budget, cov
 
 **Gate G-05:** mock-LLM E2E проходит `intent → plan → tasks → retrieval → evidence → gap → next task → sufficiency → finalize`.
 
-Примечание (A-16): Research Engine вызывает typed primitives EPIC-04 и не реализует второй SufficiencyEvaluator; G-05 проверяется через FakeLLM. Примечание (A-01): архитектурной зависимости EPIC-06 от EPIC-05 нет; gated-порядок сохраняется.
+Примечание (A-16): Research Engine вызывает typed primitives EPIC-04 и не реализует второй SufficiencyEvaluator; G-05 проверяется через FakeLLM. Примечание (A-01): архитектурной зависимости EPIC-06 от EPIC-05 нет; gated-порядок сохраняется. Определение нормы — `MASTER DEVELOPMENT ROADMAP v1.2` §21.1.
 
 ---
 
