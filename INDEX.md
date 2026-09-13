@@ -168,40 +168,52 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 ## 6. Карта Gate G-01…G-11
 
 > Определения — `EPIC SPECIFICATIONS v1.0 — BASELINE.md`, стр. 26–244.
+> Колонка `Fixtures` — какие тестовые наборы требует Gate. Полный перечень — `07` §28 (8 компонентов); статус унификации — `S-15`.
 
-| Gate | EPIC | Критерий прохождения |
-|---|---|---|
-| **G-01** | EPIC-01 Foundation | Запуск, конфигурация, изоляция тестов, errors, logging, package boundaries, базовые тесты |
-| **G-02** | EPIC-02 Data Layer | Migrations, CRUD, rollback, FK, isolation, document reuse, idempotency, concurrent read/write, WAL, DB-write layer, deterministic fixtures, FTS5 readiness, WAL-safe snapshot/backup |
-| **G-03** | EPIC-03 State Machines | Разрешённые/запрещённые переходы, mandatory scenarios |
-| **G-04** | EPIC-04 Search Core | Детерминизм retrieval, deduplication, query fingerprint, FTS5/BM25 ↔ DocumentChunk, lifecycle индекса, evidence provenance, budget, cache, normalizer versioning |
-| **G-05** | EPIC-05 Research Engine | Mock-LLM E2E: `intent → plan → tasks → retrieval → evidence → gap → next task → sufficiency → finalize` |
-| **G-06** | EPIC-06 LLM Backend | Unreachable, timeout, invalid/truncated JSON, degraded response, restart, backend switch, context budget, schema/semantic validation, constrained decoding, repair fallback, state preservation |
-| **G-07** | EPIC-07 MCP | Все 23 tools зарегистрированы, проходят contract tests |
-| **G-08** | EPIC-08 GUI | Business rules не в GUI, workers, UI responsive, cancellation, project switching, offline, snapshot, evidence traceability |
-| **G-09** | EPIC-09 Integration & Resilience | Recovery не теряет валидные данные, не создаёт дубликаты, не нарушает FSM, сохраняет audit trail, восстанавливает session/job state |
-| **G-10** | EPIC-10 Final QA | Все обязательные критерии ТЗ, критических известных дефектов нет |
-| **G-11** | EPIC-11 Packaging/Portable | Запуск на целевой Windows без IDE + понятная диагностика отсутствующих компонентов |
+| Gate | EPIC | Критерий прохождения | Fixtures |
+|---|---|---|---|
+| **G-01** | EPIC-01 Foundation | Запуск, конфигурация, изоляция тестов, errors, logging, package boundaries, базовые тесты | `E01-T13` (stdout/logging isolation fixture) |
+| **G-02** | EPIC-02 Data Layer | Migrations, CRUD, rollback, FK, isolation, document reuse, idempotency, concurrent read/write, WAL, DB-write layer, deterministic fixtures, FTS5 readiness, WAL-safe snapshot/backup | **deterministic fixtures** (`E02-T28`) |
+| **G-03** | EPIC-03 State Machines | Разрешённые/запрещённые переходы, mandatory scenarios | FSM-сценарии (`E03-T2x`) |
+| **G-04** | EPIC-04 Search Core | Детерминизм retrieval, deduplication, query fingerprint, FTS5/BM25 ↔ DocumentChunk, lifecycle индекса, evidence provenance, budget, cache, normalizer versioning | **fixtures без реальной LLM** (`A-16`); RU-корпус, копии/цитаты/UNKNOWN |
+| **G-05** | EPIC-05 Research Engine | Mock-LLM E2E: `intent → plan → tasks → retrieval → evidence → gap → next task → sufficiency → finalize` | **`FakeLLM`** (mock-LLM E2E) |
+| **G-06** | EPIC-06 LLM Backend | Unreachable, timeout, invalid/truncated JSON, degraded response, restart, backend switch, context budget, schema/semantic validation, constrained decoding, repair fallback, state preservation | **`FakeLLM`** + malformed tool calls |
+| **G-07** | EPIC-07 MCP | Все 23 tools зарегистрированы, проходят contract tests | contract tests (`E07-T2x`) |
+| **G-08** | EPIC-08 GUI | Business rules не в GUI, workers, UI responsive, cancellation, project switching, offline, snapshot, evidence traceability | traceability view (`E08-T11`) |
+| **G-09** | EPIC-09 Integration & Resilience | Recovery не теряет валидные данные, не создаёт дубликаты, не нарушает FSM, сохраняет audit trail, восстанавливает session/job state | **fault injection**: crash после reserve |
+| **G-10** | EPIC-10 Final QA | Все обязательные критерии ТЗ, критических известных дефектов нет | golden-снапшоты; **adversarial fixtures** (`N-03`) |
+| **G-11** | EPIC-11 Packaging/Portable | Запуск на целевой Windows без IDE + понятная диагностика отсутствующих компонентов | env-checker stubs; missing-dependency fixtures |
 
 ---
 
 ## 7. Карта EPIC-01…EPIC-11
 
 > Спецификации — `EPIC SPECIFICATIONS v1.0`, стр. 18–244. Порядок — `MASTER ROADMAP v1.2` §3.
+> Колонка `TASK` — диапазон задач из `EPIC → TASK DECOMPOSITION v1.0` (всего 283). Колонка `ADR` — архитектурные решения, от которых EPIC зависит.
 
-| EPIC | Название | Gate | Файлы модулей (ARCHITECTURE §2) |
+| EPIC | Название | Gate | Задачи (TASK) | ADR | Файлы модулей (ARCHITECTURE §2) |
+|---|---|---|---|---|---|
+| **EPIC-01** | FOUNDATION | G-01 | `E01-T01…T14` | — | `app/`, `infra/`, `tests/` |
+| **EPIC-02** | DATA LAYER | G-02 | `E02-T01…T29` | **ADR-003** (частично: `SourceRelation`) | `db/` (connection_factory, migrations, write_layer, repositories, registry, backup, fts) |
+| **EPIC-03** | STATE MACHINES | G-03 | `E03-T01…T24` | — | `core/state_machines/` (6 FSM) |
+| **EPIC-04** | SEARCH CORE | G-04 | `E04-T01…T52` | **ADR-003** (частично: `independent_source_count`) | `core/retrieval/`, `core/evidence/`, `core/analysis/`, `core/budget/` |
+| **EPIC-05** | RESEARCH ENGINE | G-05 | `E05-T01…T28` | **ADR-001** | `core/research_engine/`, `core/config/` |
+| **EPIC-06** | LLM BACKEND | G-06 | `E06-T01…T25` | **ADR-001** | `llm/` (provider, router, structured_output, token_budget_manager, prompt) |
+| **EPIC-07** | MCP | G-07 | `E07-T01…T34` | **ADR-001** | `mcp_server/` (server, transport_guard, tools, schemas) |
+| **EPIC-08** | GUI | G-08 | `E08-T01…T22` | — | `gui/` (views, widgets, viewmodels, bridge) |
+| **EPIC-09** | INTEGRATION & RESILIENCE | G-09 | `E09-T01…T18` | — | сквозной (recovery, reconciliation, outbox replay) |
+| **EPIC-10** | FINAL QA / ACCEPTANCE | G-10 | `E10-T01…T19` | — | `tests/` (golden, integration) |
+| **EPIC-11** | PACKAGING / PORTABLE | G-11 | `E11-T01…T18` | — | `packaging/`, env checker |
+
+**ADR-контур (статус: `Proposed`, не приняты):**
+
+| ADR | Предмет | Блокер | Влияет на |
 |---|---|---|---|
-| **EPIC-01** | FOUNDATION | G-01 | `app/`, `infra/`, `tests/` |
-| **EPIC-02** | DATA LAYER | G-02 | `db/` (connection_factory, migrations, write_layer, repositories, registry, backup, fts) |
-| **EPIC-03** | STATE MACHINES | G-03 | `core/state_machines/` (6 FSM) |
-| **EPIC-04** | SEARCH CORE | G-04 | `core/retrieval/`, `core/evidence/`, `core/analysis/`, `core/budget/` |
-| **EPIC-05** | RESEARCH ENGINE | G-05 | `core/research_engine/`, `core/config/` |
-| **EPIC-06** | LLM BACKEND | G-06 | `llm/` (provider, router, structured_output, token_budget_manager, prompt) |
-| **EPIC-07** | MCP | G-07 | `mcp_server/` (server, transport_guard, tools, schemas) |
-| **EPIC-08** | GUI | G-08 | `gui/` (views, widgets, viewmodels, bridge) |
-| **EPIC-09** | INTEGRATION & RESILIENCE | G-09 | сквозной (recovery, reconciliation, outbox replay) |
-| **EPIC-10** | FINAL QA / ACCEPTANCE | G-10 | `tests/` (golden, integration) |
-| **EPIC-11** | PACKAGING / PORTABLE | G-11 | `packaging/`, env checker |
+| **ADR-001** | MCP-host и владелец агентного цикла (профили desktop orchestration / headless `--mcp-stdio`) | `N-01` (P0) | EPIC-05, EPIC-06, EPIC-07 |
+| **ADR-002** | Идентичность Document при смене URL | `S-12` / `Q-08` (P0) | EPIC-02, EPIC-04 |
+| **ADR-003** | `SourceRelation` UNIQUE vs `claim_id` | `N-02` (P0) | EPIC-02, EPIC-04 |
+
+> Зависимые задачи держатся `BLOCKED` до получения статуса `Accepted` (`REVIEW-REGISTRY.md` §6 п.1).
 
 **Нормативные приложения по EPIC:**
 
