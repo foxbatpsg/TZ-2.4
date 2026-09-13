@@ -32,7 +32,7 @@
 | **S-09** | Нет согласованного baseline документов | P1 | `ACCEPT` ✅ внесено 2026-09-14 | ARCHITECTURE §Иерархия, 07 §27.2 | SUGG §2.2 |
 | **S-10** | Не типизирован транспорт Watchdog → Core | P1 | `ACCEPT` | 02 §7, EPIC-03/06 | SUGG §2.3 |
 | **S-11** | Алгоритм `independent_source_count` не доопределён | P1 | `ACCEPT-MODIFIED` | 01 §7, 07 §14 | SUGG §2.4 |
-| **S-13** | CPU-only профиль и RU-морфология не измерены | P1 | `ACCEPT` | 02 §5, 04 §14.1 | SUGG §2.6 |
+| **S-13** | CPU-only профиль и RU-морфология не измерены | P1 | `REJECT-VERIFIED` (2026-09-14) | — | SUGG §2.6 |
 | **S-15** | Fixtures/golden-наборы не унифицированы | P1 | `ACCEPT` | 07 §28 | SUGG §3.2 |
 | **S-16** | Context Header не содержит `RELATED_ADR` | P1 | `ACCEPT` | TASK EXEC. CONTRACT §4 | SUGG §3.3 |
 | **S-17** | Миграции не назначены источником истины схемы | P1 | `ACCEPT` | 03 §21–22, EPIC-02 | SUGG §3.4 |
@@ -43,7 +43,7 @@
 | **S-02** | «ModelManager отсутствует, нужен новый компонент» | P1 | `REJECT-VERIFIED` | 05 §1–2 (уточнить) | SUGG §1.2 |
 | **D-4** | **A-01 не определён в текущем корпусе** | **P1** | ✅ `RESOLVED` / `CLOSED` | «УИ v1.0» / приложения | формулировка найдена в старых файлах, внесена в корпус |
 
-**Итог:** `ACCEPT` — 14, `ACCEPT-MODIFIED` — 2, `REJECT-VERIFIED` — 3, `DEFER` — 1 (`S-03`), `RESOLVED` / `CLOSED` — 1 (`D-4`).
+**Итог:** `ACCEPT` — 13, `ACCEPT-MODIFIED` — 2, `REJECT-VERIFIED` — 4 (`S-05`, `S-01`, `S-02`, `S-13`), `DEFER` — 1 (`S-03`), `RESOLVED` / `CLOSED` — 1 (`D-4`).
 **Блокеров P0:** 3 (N-01, S-12, N-02) — все подтверждены проверкой по тексту.
 
 ---
@@ -209,7 +209,7 @@
 | **S-09** | ✅ **Внесено 2026-09-14** как норма в `07` §27.2 «Согласованный baseline документов (S-09)» и поле `BASELINE_ID` в `TASK EXECUTION CONTRACT v1.0` §4: baseline = зафиксированные пути/версии/хеши нормативных документов, привязанные к commit SHA, обновляется атомарно; **отдельное поле `BASELINE_ID` обязательно во всех TASK**, до введения baseline — переходное значение `PRE-BASELINE`, после — только реальный идентификатор (несовместимое значение → `BLOCKED / STOP`); `CHANGELOG` + ADR (`Proposed`/`Accepted`/`Superseded`); приоритет ТЗ сохраняется. Приёмка: скрипт валидирует ссылки и хеши; смешанный набор версий не допускается. **Вариант реализации: только норма, без создания инфраструктуры** — файлы `BASELINE.md`/`CHANGELOG`/ADR создаёт команда разработки. Часть про EPIC-10 уже выполнена как `D-1`. |
 | **S-10** | Ввести immutable `WatchdogSignal(event_id, backend_id, observed_state, observed_at, generation)`. Из worker-потока — только `loop.call_soon_threadsafe` в bounded `asyncio.Queue`; бизнес-обработчик Core выполняет FSM. Описать coalesce, overflow, stale generation, shutdown/drain. Прямое использование `asyncio.Queue` из чужого потока — запретить. Watchdog не пишет в БД и не выполняет переходы. |
 | **S-11** | Уточнить claim-scoped алгоритм `independent_source_count`: применить approved global/specific policy, объединить `COPY/REWRITE/SAME_PRIMARY` в кластер, свести зависимые `CITATION` к первичному подтверждению, `UNKNOWN` не добавляет подтверждений. Явно определить обработку циклов и отсутствующего первоисточника; при неопределённости — `INSUFFICIENT_EVIDENCE`. Новое число для UNKNOWN **не изобретать** — правило уже есть в `01` §7. |
-| **S-13** | Провести benchmark-spike до оценки сроков: конкретный CPU, RAM, Windows build, model digest, quant, context. Кандидат baseline — 6 ядер / 32 GB RAM / SSD без GPU (не обещание минимума). Измерить TTFT, tokens/s, peak RSS, индексацию, p95 поиска, UI latency — с параллельным инференсом и без. Значения до измерений помечать `TARGET`, не `RESULT`. |
+| **S-13** | ❌ **`REJECT-VERIFIED` (2026-09-14)** — в корпус **не вносится**. Аппаратная конфигурация не является предметом нормирования ТЗ: пользователь определяет её сам под своё оборудование. Требование benchmark-spike, аппаратный кандидат «6 ядер / 32 GB / SSD» и UX-ориентиры по задержкам (`p95 ≤300 мс`, GUI `≤100 мс`) отклонены. Существующее положение `02` §5 (работа без обязательной GPU) — архитектурный принцип, а не требование к железу пользователя; оно сохраняется без изменений и не ограничивает конфигурацию сверху. Проверено по корпусу: числовых требований к железу в ТЗ нет и не вводится. |
 | **S-15** | Версионированный `fixtures manifest`: seed, хеши, fake clock, `FakeLLM`, `MockSourceAdapter`. Общие корпуса: RU, копии/цитаты/UNKNOWN, URL-only vs content update, malformed tool calls, crash после reserve. Golden-снапшоты меняются только отдельной review-задачей. Тесты не обращаются к реальному Ollama и не зависят от текущего времени. |
 | **S-16** | Добавить в обязательный Context Header: `BASELINE_ID`, `RELATED_ADR` (явное `NONE`, если решений нет), `BLOCKED_BY`. Сохранить `ALLOWED_FILES`/`FORBIDDEN_FILES`, acceptance, `STOP_CONDITIONS` и лимит repair-цикла в 3 итерации. Любой `Proposed` ADR блокирует зависимую реализацию. |
 | **S-17** | Назначить `db/migrations/` **единственным исполняемым источником физической схемы**. Нормативное ТЗ задаёт семантику, но не дублирует `CREATE TABLE`. Запретить второй ручной `CREATE TABLE` в fixtures/репозиториях. Документацию схемы генерировать из мигрированной тестовой БД. Раздельные ветки миграций Project DB и `registry.db`. |
