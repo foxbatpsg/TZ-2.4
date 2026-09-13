@@ -371,6 +371,8 @@ Budget exhausted → FINALIZING → COMPLETED с PARTIAL виден в GUI и к
 ### Приёмка
 Все обязательные gate-тесты выполняются offline, два запуска дают одинаковый результат; тесты не обращаются к настоящему Ollama и не зависят от текущего времени.
 
+> **Статус: `ACCEPT` ✅ внесено 2026-09-14** — `07` §28.1 «Fixtures manifest и общие корпуса (`S-15`)»: версионированный `fixtures manifest` (`fixture_id`, `seed`, `hash`, `version`, ссылка на Gate и норму), единые `fixture_id` во всех TASK, fake clock, пять общих корпусов, правило golden-снапшотов. См. `REVIEW-REGISTRY.md` §4 п. `S-15`.
+
 Задача: TASK-07
 
 ---
@@ -950,6 +952,8 @@ OPEN_QUESTIONS: оставшиеся вопросы
 **Правка:** Версионированный fixtures manifest с seed, hashes, fake clock, FakeLLM и MockSourceAdapter. Общие корпуса RU, копии/цитаты/UNKNOWN, URL-only/content update, malformed tool calls, crash после reserve. Snapshot golden меняется только отдельной review-задачей.
 
 **Приёмка:** Все обязательные gate-тесты выполняются offline, два запуска дают одинаковый результат; тесты не обращаются к настоящему Ollama и не зависят от текущего времени.
+
+> **Статус: `ACCEPT` ✅ внесено 2026-09-14** — `07` §28.1 «Fixtures manifest и общие корпуса (`S-15`)». См. `REVIEW-REGISTRY.md` §4 п. `S-15`.
 
 ## Формат отчёта агента
 
