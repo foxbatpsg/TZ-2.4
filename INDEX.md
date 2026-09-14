@@ -9,7 +9,7 @@
 | Включено | Не включено |
 |---|---|
 | Основное ТЗ: `01`–`07` (7 файлов, ~211 КБ) | Карточки `Research_Prompt_Suite_Task_Cards_Astra1` (11 файлов) |
-| Приложения: `STATE MACHINE SPEC`, `BUDGET CONTRACT`, `MCP TOOL CONTRACTS`, `EPIC SPECIFICATIONS`, `EPIC → TASK DECOMPOSITION`, `MASTER ROADMAP`, `TASK EXECUTION CONTRACT` (7 файлов) | `замечания GPT6.md`, `SUGGESTIONS.md`, `README`/`CHANGELOG` |
+| Приложения: `STATE MACHINE SPEC`, `BUDGET CONTRACT`, `MCP TOOL CONTRACTS`, `EPIC SPECIFICATIONS`, `EPIC → TASK DECOMPOSITION`, `MASTER ROADMAP`, `TASK EXECUTION CONTRACT` (7 файлов) | `SUGGESTIONS.md`, `README`/`CHANGELOG` |
 | `ARCHITECTURE.md` (производный, не нормативный) | Папка `корзина/` |
 
 **Проектное решение.** Индекс спроектирован как каркас для последующего перехода к машиночитаемым требованиям (`requirements.yaml`, вариант 2). Ключевое поле каждой нормы — `canonical` (первичный источник). Оно критично, потому что значительная часть норм определена **несколько раз** в разных файлах с разными акцентами. Без явного `canonical` возникает несколько «истин» для одной нормы — класс дефекта, уже проявившийся в противоречии `A-13` ↔ `EPIC-10`.
