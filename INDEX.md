@@ -114,7 +114,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | ID | Тема | Первичный источник | Упоминания | Статус |
 |---|---|---|---|---|
 | **Q-01** | Синхронизация Project DB → `registry.db` через transactional outbox | `03` §25.3, стр. 816 | — | закрыто |
-| **Q-02** | Независимость источников на уровне Claim (claim-scoped) | `01` §7, стр. 341 | `03` §8a стр.246; `07` §14 стр.213 | **N-02, S-11 → требует ADR** |
+| **Q-02** | Независимость источников на уровне Claim (claim-scoped) | `01` §7, стр. 341 | `03` §8a стр.246; `07` §14 стр.213 | ✅ **N-02 закрыт** (ADR-003, 2026-09-14); ожидание `S-11` снято |
 | **Q-03** | Strategy profiles и пороги остановки (EVIDENCE / AGGREGATION) | `04` §22, стр. 578 | `01` §7 стр.255 | закрыто |
 | **Q-04** | Бюджет: `reserve`/`commit`/`release` в одной транзакции | `03` §17c, стр. 644 | `04` §22 стр.576, §25 стр.619 | закрыто |
 | **Q-05** | Межавтоматная policy при восстановлении после recovery | `01` §2.3, стр. 115 | — | закрыто |
@@ -141,9 +141,9 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | `SearchTask` | `03` §6 | `query_fingerprint` UNIQUE в пределах Study (A-04); `gap_id` (A-15) | → Study, → ResearchGap |
 | `SearchResult` | `03` §7 | Идентификаторы в `SearchResultIdentifier` (A-03) | *→1 Source |
 | `Source` | `03` §8 | `canonical_url` UNIQUE; качество — в `SourceQualityAssessment` (A-10) | *↔* Source |
-| **`SourceRelation`** | `03` §8a | COPY/REWRITE/CITATION/SAME_PRIMARY/UNKNOWN; **UNIQUE-конфликт с `claim_id`** | *↔* Source, → Claim |
+| **`SourceRelation`** | `03` §8a | COPY/REWRITE/CITATION/SAME_PRIMARY/UNKNOWN; два частичных UNIQUE-индекса + FK на `Claim` (N-02, ADR-003) | *↔* Source, → Claim |
 | `Entity` | `03` §8b | Алиасы в `EntityAlias` (A-03) | — |
-| **`Document`** | `03` §9 | `content_hash` UNIQUE; неизменяемость (A-21); **Q-08 открыт** | *↔* Study via StudyDocumentLink |
+| **`Document`** | `03` §9 | `content_hash` UNIQUE; неизменяемость (A-21); механизм версионирования — `03` §9b (Q-08 ✅ CLOSED, ADR-002) | *↔* Study via StudyDocumentLink |
 | `DocumentSourceOccurrence` | `03` §9a | 5 копий → 1 тело + 5 происхождений (A-08) | → Document, → Source |
 | `DocumentChunk` | `03` §11 | `chunk_id` детерминирован (A-07); интервалы (A-06) | 1→* Evidence |
 | `Evidence` | `03` §13 | `evidence_hash` UNIQUE; проверка по позиции (A-05) | *↔* Chunk, → Source |
@@ -211,9 +211,9 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 |---|---|---|---|
 | **ADR-001** | MCP-host и владелец агентного цикла (профили desktop orchestration / headless `--mcp-stdio`) | `N-01` (P0) | EPIC-05, EPIC-06, EPIC-07 |
 | **ADR-002** ✅ Accepted 2026-09-14 | Идентичность Document при смене URL: идемпотентное окно 24ч, флаг `refresh=true` в `read_url_content`, Evidence фиксирует версию (A-21), `CONTENT_UNCHANGED` при совпадении hash | `S-12` / `Q-08` (P0) → **CLOSED** | EPIC-02, EPIC-04 (E02-T10, E02-T20, E04-T33/34/35 — ✅ unblocked) |
-| **ADR-003** | `SourceRelation` UNIQUE vs `claim_id` | `N-02` (P0) | EPIC-02, EPIC-04 |
+| **ADR-003** ✅ Accepted 2026-09-14 | `SourceRelation` UNIQUE vs `claim_id`: два частичных UNIQUE-индекса (claim-specific и общий) + FK на `Claim` | `N-02` (P0) → **CLOSED** | EPIC-02, EPIC-04 (E02-T09, E02-T17, E04-T07 — ✅ unblocked) |
 
-> ADR-002 принят 2026-09-14 (черновик Q-08 из корзины утверждён). ADR-001, ADR-003 — `Proposed`, зависимые задачи `BLOCKED` до `Accepted`.
+> ADR-002 и ADR-003 приняты 2026-09-14 (черновик Q-08 из корзины утверждён; `N-02` закрыт нормой в `03` §8a). ADR-001 — `Proposed`, зависимые задачи `BLOCKED` до `Accepted`.
 
 **Нормативные приложения по EPIC:**
 
@@ -235,7 +235,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 |---|---|---|---|
 | Многомерный бюджет (7 dimensions) | `01` §6a; `03` §17c | BUDGET CONTRACT v1.0 | Q-04 |
 | Sufficiency Criteria и пороги остановки | `01` §7; `04` §22 | — | Q-03 |
-| Независимость источников | `01` §7 (стр.331+); `07` §14 | — | Q-02, **N-02, S-11** |
+| Независимость источников | `01` §7 (стр.331+); `07` §14 | — | Q-02 (`N-02` ✅ CLOSED, ADR-003); `S-11` |
 | Формальные FSM (6 автоматов) | `01` §2.3; `02` §3 | STATE MACHINE SPEC v1.2 | — |
 | MCP-транспорт и 23 инструмента | `05` §3–4 | MCP TOOL CONTRACTS v1.1 | **N-01** |
 | Query Fingerprint и защита от дублей | `04` §20 | — | A-04 |
@@ -257,7 +257,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | Partial report / FULL-PARTIAL | `05` §15; `06` §8 | STATE MACHINE SPEC §1 | **S-08** |
 | stdout protection | `05` §3.1; `07` §19.1 | — | A-20, **S-04** |
 | Post-MVP список (отложенные механизмы) | `07` §26 | — | **S-03** (хранение API-ключей, `DEFER`) |
-| Версионирование Document (механизм A-21) | `03` §9b; `04` §25 | MCP TOOL CONTRACTS v1.2 §3 | **Q-08 (CLOSED, ADR-002, 2026-09-14)** |
+| Версионирование Document (механизм A-21) | `03` §9b; `04` §25 | MCP TOOL CONTRACTS v1.1 §3 | **Q-08 (CLOSED, ADR-002, 2026-09-14)** |
 
 ---
 
@@ -272,7 +272,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | **D-4** | ⚠ Дубли определений: A-03 (×7), A-02/A-10/A-21/Q-04 (×4) — расхождение акцентов | `03`, `04`, `05`, `01` | требует назначения `canonical` при переходе к варианту 2 |
 | **D-5** | `Q-13` использовался вне нормативного корпуса (карточки Astra1) как блокер, но в реестре `Q-01…Q-08` отсутствовал | карточки Astra1: 5 упоминаний | ✅ **CLOSED** (2026-09-13) — решение принято, diagnostic token снят из MVP. См. §4 `Q-13` |
 | — | **N-01** — MCP-host не определён | `05` §2–3 | **P0-блокер** |
-| — | **N-02** — SourceRelation UNIQUE vs `claim_id` | `03` §8a | **P0-блокер** |
+| — | ~~**N-02** — SourceRelation UNIQUE vs `claim_id`~~ | ~~`03` §8a~~ | ✅ **CLOSED** (ADR-003, 2026-09-14: два частичных UNIQUE-индекса + FK на `Claim`; норма внесена в `03` §8a) |
 
 ### 9.1. Задачи, заблокированные P0-блокерами (`S-14`)
 
@@ -283,10 +283,9 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | ~~**S-12 / Q-08**~~ — Document identity при смене URL | ~~ADR-002~~ | ✅ **СНЯТО** (ADR-002 принят 2026-09-14) | `E02-T10` — ✅ unblocked · `E02-T20` — ✅ unblocked · `E04-T33` — ✅ unblocked · `E04-T34` — ✅ unblocked · `E04-T35` — ✅ unblocked |
 | **N-01** — MCP-host не определён | ADR-001 | **EPIC-07 целиком** (`E07-T01…T34`), в первую очередь группа `M1 — Transport/core boundary` (`E07-T01…T05`) | `REVIEW-REGISTRY.md` §3: «Любые TASK по EPIC-05/06/07 до принятия ADR должны быть `BLOCKED`» |
 | **N-01** — MCP-host не определён | ADR-001 | EPIC-05 (`E05-T01…T28`), EPIC-06 (`E06-T01…T25`) | То же указание реестра (агентный цикл и LLM-хост — предмет ADR-001) |
-| **N-02** — SourceRelation UNIQUE vs `claim_id` | ADR-003 | `E02-T09` (SearchTask/Source/SourceRelation/SearchResult schema), `E02-T17` (foreign keys, indexes and uniqueness constraints) | Прямой предмет конфликта UNIQUE-индекса |
-| **N-02** — SourceRelation UNIQUE vs `claim_id` | ADR-003 | `E04-T07` (SourceRelation handling) | Единственная задача, непосредственно работающая с `SourceRelation` |
+| ~~**N-02**~~ — SourceRelation UNIQUE vs `claim_id` | ~~ADR-003~~ | ✅ **СНЯТО** (ADR-003 принят 2026-09-14) | `E02-T09` — ✅ unblocked · `E02-T17` — ✅ unblocked · `E04-T07` — ✅ unblocked |
 
-> `S-11` (`independent_source_count`) доопределяется после `ADR-003`, но отдельной задачи в декомпозиции не имеет — алгоритм реализуется в составе `E04-T48` (`CoverageCalculator`). Явного указания на это в задаче нет, поэтому связь не фиксируется (`S-14`, вариант «только явные связи»).
+> `S-11` (`independent_source_count`) — ожидание `ADR-003` **снято 2026-09-14**: формула `independent_source_count(claim)` уже определена в `01` §7, требование к подсчёту — в `07` §14. Отдельной задачи в декомпозиции не имеет — алгоритм реализуется в составе `E04-T48` (`CoverageCalculator`). Явного указания на это в задаче нет, поэтому связь не фиксируется (`S-14`, вариант «только явные связи»).
 
 ---
 
@@ -327,7 +326,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
   canonical: "03_Модель данных и хранение.md §9b (ADR-002, принят 2026-09-14)"
   title: "Версионирование Document при смене URL"
   text: "Идемпотентное окно 24 часа; флаг refresh=true в read_url_content (MCP TOOL CONTRACTS §3) — явный механизм принудительного обновления (отдельный refresh-tool не вводится); Evidence фиксирует версию Document (A-21); EXPAND использует последнюю доступную версию; при совпадении content_hash новая версия не создаётся (CONTENT_UNCHANGED). A-21 не изменён — механизм операционализирует его нормативную формулировку."
-  mentions: [ "07_QA_Acceptance.md §17", "04_Search Core.md §25", "MCP TOOL CONTRACTS v1.2 §3" ]
+  mentions: [ "07_QA_Acceptance.md §17", "04_Search Core.md §25", "MCP TOOL CONTRACTS v1.1 §3" ]
   conflicts: []
   gates: [G-04, G-07]
   epics: [EPIC-02, EPIC-04, EPIC-07]
