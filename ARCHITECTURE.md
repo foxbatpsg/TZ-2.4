@@ -181,7 +181,7 @@ research-prompt-suite/
 │   ├── time_utils.py                   # monotonic time для time_budget, единый источник времени
 │   └── security/                       # Хранение секретов (credential store), whitelisting file_ref
 │
-├── packaging/                          # Сборка Windows-дистрибутива (PyInstaller/Nuitka), инсталлятор
+├── packaging/                          # Сборка portable-дистрибутива Windows (PyInstaller)
 │
 ├── docs/                               # Нормативные документы проекта
 │   ├── tz/                             # Копия/ссылка на разделы 01–07 ТЗ v2.4

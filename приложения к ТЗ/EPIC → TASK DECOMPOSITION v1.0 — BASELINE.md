@@ -555,7 +555,7 @@ CODE / TEST / REVIEW
 ### Group P1 — Portable structure
 
 * **E11-T01** — portable folder layout.
-* **E11-T02** — runtime/config packaging.
+* **E11-T02** — runtime/config packaging (сборка — PyInstaller).
 * **E11-T03** — local data/DB packaging rules.
 * **E11-T04** — startup/bootstrap packaging.
 
