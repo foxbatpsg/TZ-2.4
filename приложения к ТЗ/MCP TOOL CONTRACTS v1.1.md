@@ -118,8 +118,6 @@ CREATED → VALIDATING → QUEUED → RUNNING
 | Поле | Контракт |
 |---|---|
 | INPUT | `study_id`, `task_id`, `url` ; `refresh` (bool, default `false`, Q-08) |
-| INPUT | `study_id`, `task_id`, `url` |
-| OUTPUT | `document_id`, `title`, `content_length`, `chunks_count`, `status`, `operation_id` |
 | OUTPUT | `document_id`, `title`, `content_length`, `chunks_count`, `status`, `operation_id`; `CONTENT_UNCHANGED` при совпадении `content_hash` после `refresh` |
 | ERRORS | `NETWORK_ERROR`, `TIMEOUT`, `SOURCE_UNAVAILABLE`, `PARSE_ERROR`, `FULL_TEXT_UNAVAILABLE`, `CONTENT_TOO_LARGE`, `INVALID_INPUT`, `DATABASE_ERROR` |
 | LIMITS | max fetch size из `ResearchConfig`; default 5 MiB |
@@ -127,11 +125,10 @@ CREATED → VALIDATING → QUEUED → RUNNING
 | RETRY | 1 retry для `NETWORK_ERROR`; нет retry для parse/unavailable |
 | SIDE EFFECTS | Document/Chunk/Source/StudyDocumentLink/BM25; `fetch_budget` |
 | IDEMPOTENCY | `SHA256(canonical_url)` в рамках project; повтор возвращает существующий Document. Флаг `refresh=true` отключает идемпотентное окно и инициирует принудительное обновление (Q-08, ADR-002): при совпадении `content_hash` новая версия Document не создаётся, ответ `CONTENT_UNCHANGED` |
-
-**Q-08, ADR-002 (2026-09-14):** идемпотентное окно 24 часа; флаг `refresh=true` — явный механизм принудительного обновления (отдельный `refresh`-tool не вводится); Study «замораживает» версию Document, на которую ссылается Evidence (A-21); EXPAND использует последнюю доступную версию; при совпадении `content_hash` новая версия не создаётся.
-| IDEMPOTENCY | `SHA256(canonical_url)` в рамках project; повтор возвращает существующий Document |
 | CANCELLATION | timeout |
 | AUTHORITY | LLM выбирает URL; Core проверяет доступность/лимиты и сохраняет |
+
+**Q-08, ADR-002 (2026-09-14):** идемпотентное окно 24 часа; флаг `refresh=true` — явный механизм принудительного обновления (отдельный `refresh`-tool не вводится); Study «замораживает» версию Document, на которую ссылается Evidence (A-21); EXPAND использует последнюю доступную версию; при совпадении `content_hash` новая версия не создаётся.
 
 При недоступном полном тексте возвращается `FULL_TEXT_UNAVAILABLE`. Содержимое запрещено выдумывать.
 
