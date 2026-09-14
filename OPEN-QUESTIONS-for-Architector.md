@@ -10,14 +10,16 @@
 
 | № | Вопрос | Приор. | Блокирует | Тип решения |
 |---|---|---|---|---|
-| 1 | MCP-host и владелец агентного цикла | **P0** | EPIC-05 / 06 / 07 | ADR |
-| 2 | Document identity vs `content_hash UNIQUE` | **P0** | `Document.version`, URL update | ADR |
-| 3 | `SourceRelation` UNIQUE и `claim_id` | **P0** | `independent_source_count` | ADR |
+| 1 | MCP-host и владелец агентного цикла — ✅ **ЗАКРЫТ** (ADR-001, 2026-09-14) | **P0** | EPIC-05 / 06 / 07 | ADR |
+| 2 | Document identity vs `content_hash UNIQUE` — ✅ **ЗАКРЫТ** (ADR-002, 2026-09-14) | **P0** | `Document.version`, URL update | ADR |
+| 3 | `SourceRelation` UNIQUE и `claim_id` — ✅ **ЗАКРЫТ** (ADR-003, 2026-09-14) | **P0** | `independent_source_count` | ADR |
 | 4 | Граница гарантий: уровни валидации и недоверенные данные | P1 | Контур доверия и безопасности | Решение |
 
 ---
 
-## Вопрос 1. MCP-host и владелец агентного цикла
+## Вопрос 1. MCP-host и владелец агентного цикла — ✅ ЗАКРЫТ (ADR-001, 2026-09-14)
+
+**Принято:** вариант 3 — два профиля исполнения. Норма «Профили исполнения и владелец агентного цикла (N-01, ADR-001)» внесена в `02` §3a: **desktop orchestration** (по умолчанию — Orchestrator в процессе приложения, обращение к LLM по HTTP, вызовы инструментов через единый ToolDispatcher) и **headless `--mcp-stdio`** (агентный цикл ведёт внешний MCP-клиент, stdio-адаптер транслирует вызовы в тот же ToolDispatcher, набор — те же 23 инструмента). Явно зафиксировано: MCP — протокол **вызова инструментов**, а не протокол инференса; обращение к LLM идёт отдельным каналом. Один процесс ядра на файл Project DB, второй запуск → `PROJECT_LOCKED`; ядро не запускает LLM как дочерний процесс. Уточняющая сноска внесена в `05` §3.
 
 **Приоритет:** P0 · **Тип:** требуется ADR (`ADR-001`)
 
@@ -47,7 +49,6 @@
 ## Вопрос 2. Document identity против `content_hash UNIQUE` — ✅ ЗАКРЫТ (ADR-002, 2026-09-14)
 
 **Принято:** черновик Q-08 из корзины утверждён как ADR-002. Нормативные правки внесены: `03` §9b (механизм версионирования), `04` §25 (FORCED_REFRESH для MCP), `MCP TOOL CONTRACTS` §3 (`read_url_content` + `refresh`), `07` §17 (Q-08 закрыт). A-21 **не изменён** — черновик согласован с его нормативной формулировкой («не перезаписывает Document — создаётся новая версия»), а механизм её операционализирует.
-## Вопрос 2. Document identity против `content_hash UNIQUE`
 
 **Приоритет:** P0 · **Тип:** требуется ADR (`ADR-002`)
 
@@ -74,7 +75,9 @@
 
 ---
 
-## Вопрос 3. `SourceRelation` UNIQUE против `claim_id`
+## Вопрос 3. `SourceRelation` UNIQUE против `claim_id` — ✅ ЗАКРЫТ (ADR-003, 2026-09-14)
+
+**Принято:** вариант 3 — два частичных UNIQUE-индекса. Норма «Уникальность SourceRelation (N-02, ADR-003)» внесена в `03` §8a: для claim-specific связей — `UNIQUE (study_id, source_source_id, target_source_id, claim_id) WHERE claim_id IS NOT NULL`; для общих — `UNIQUE (study_id, source_source_id, target_source_id) WHERE claim_id IS NULL`; `claim_id` объявлен `FOREIGN KEY REFERENCES Claim`; обязательна проверка принадлежности Claim и обоих Source одной Study; миграция проверяет существующие дубликаты до применения. Ожидание `S-11` снято — формула `independent_source_count(claim)` определена в `01` §7.
 
 **Приоритет:** P0 · **Тип:** требуется ADR (`ADR-003`)
 

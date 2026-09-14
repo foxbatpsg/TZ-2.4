@@ -209,11 +209,11 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 
 | ADR | Предмет | Блокер | Влияет на |
 |---|---|---|---|
-| **ADR-001** | MCP-host и владелец агентного цикла (профили desktop orchestration / headless `--mcp-stdio`) | `N-01` (P0) | EPIC-05, EPIC-06, EPIC-07 |
+| **ADR-001** ✅ Accepted 2026-09-14 | MCP-host и владелец агентного цикла: два профиля — desktop orchestration (по умолчанию, Orchestrator в процессе приложения, единый ToolDispatcher) и headless `--mcp-stdio` (цикл ведёт внешний MCP-клиент); MCP — не протокол инференса; один Core на Project DB, `PROJECT_LOCKED` | `N-01` (P0) → **CLOSED** | EPIC-05, EPIC-06, EPIC-07 — ✅ unblocked |
 | **ADR-002** ✅ Accepted 2026-09-14 | Идентичность Document при смене URL: идемпотентное окно 24ч, флаг `refresh=true` в `read_url_content`, Evidence фиксирует версию (A-21), `CONTENT_UNCHANGED` при совпадении hash | `S-12` / `Q-08` (P0) → **CLOSED** | EPIC-02, EPIC-04 (E02-T10, E02-T20, E04-T33/34/35 — ✅ unblocked) |
 | **ADR-003** ✅ Accepted 2026-09-14 | `SourceRelation` UNIQUE vs `claim_id`: два частичных UNIQUE-индекса (claim-specific и общий) + FK на `Claim` | `N-02` (P0) → **CLOSED** | EPIC-02, EPIC-04 (E02-T09, E02-T17, E04-T07 — ✅ unblocked) |
 
-> ADR-002 и ADR-003 приняты 2026-09-14 (черновик Q-08 из корзины утверждён; `N-02` закрыт нормой в `03` §8a). ADR-001 — `Proposed`, зависимые задачи `BLOCKED` до `Accepted`.
+> ADR-001, ADR-002 и ADR-003 приняты 2026-09-14. Открытых P0-блокеров не осталось; зависимые задачи разблокированы (см. §9.1).
 
 **Нормативные приложения по EPIC:**
 
@@ -237,7 +237,8 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | Sufficiency Criteria и пороги остановки | `01` §7; `04` §22 | — | Q-03 |
 | Независимость источников | `01` §7 (стр.331+); `07` §14 | — | Q-02 (`N-02` ✅ CLOSED, ADR-003); `S-11` |
 | Формальные FSM (6 автоматов) | `01` §2.3; `02` §3 | STATE MACHINE SPEC v1.2 | — |
-| MCP-транспорт и 23 инструмента | `05` §3–4 | MCP TOOL CONTRACTS v1.1 | **N-01** |
+| Профили исполнения и владелец агентного цикла | `02` §3a; `05` §3 | — | **N-01 ✅ CLOSED (ADR-001, 2026-09-14)** |
+| MCP-транспорт и 23 инструмента | `05` §3–4 | MCP TOOL CONTRACTS v1.1 | **N-01 ✅ CLOSED (ADR-001, 2026-09-14)** |
 | Query Fingerprint и защита от дублей | `04` §20 | — | A-04 |
 | Дедупликация (3 уровня) | `04` §8 | — | — |
 | Chunking и overlap | `03` §11–12; `04` §13 | — | A-06, A-07 |
@@ -271,7 +272,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | — | ~~**Q-08** — версионирование Document при смене URL~~ | ~~`07` §17 стр.249~~ | ✅ **CLOSED** (ADR-002, 2026-09-14: черновик Q-08 утверждён; механизм в `03` §9b, `04` §25, `MCP TOOL CONTRACTS` §3; A-21 не изменён); S-12 |
 | **D-4** | ⚠ Дубли определений: A-03 (×7), A-02/A-10/A-21/Q-04 (×4) — расхождение акцентов | `03`, `04`, `05`, `01` | требует назначения `canonical` при переходе к варианту 2 |
 | **D-5** | `Q-13` использовался вне нормативного корпуса (карточки Astra1) как блокер, но в реестре `Q-01…Q-08` отсутствовал | карточки Astra1: 5 упоминаний | ✅ **CLOSED** (2026-09-13) — решение принято, diagnostic token снят из MVP. См. §4 `Q-13` |
-| — | **N-01** — MCP-host не определён | `05` §2–3 | **P0-блокер** |
+| — | ~~**N-01** — MCP-host не определён~~ | ~~`05` §2–3~~ | ✅ **CLOSED** (ADR-001, 2026-09-14: два профиля исполнения и владелец агентного цикла; норма внесена в `02` §3a) |
 | — | ~~**N-02** — SourceRelation UNIQUE vs `claim_id`~~ | ~~`03` §8a~~ | ✅ **CLOSED** (ADR-003, 2026-09-14: два частичных UNIQUE-индекса + FK на `Claim`; норма внесена в `03` §8a) |
 
 ### 9.1. Задачи, заблокированные P0-блокерами (`S-14`)
@@ -281,9 +282,10 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | Блокер | ADR | Заблокированные задачи | Основание |
 |---|---|---|---|
 | ~~**S-12 / Q-08**~~ — Document identity при смене URL | ~~ADR-002~~ | ✅ **СНЯТО** (ADR-002 принят 2026-09-14) | `E02-T10` — ✅ unblocked · `E02-T20` — ✅ unblocked · `E04-T33` — ✅ unblocked · `E04-T34` — ✅ unblocked · `E04-T35` — ✅ unblocked |
-| **N-01** — MCP-host не определён | ADR-001 | **EPIC-07 целиком** (`E07-T01…T34`), в первую очередь группа `M1 — Transport/core boundary` (`E07-T01…T05`) | `REVIEW-REGISTRY.md` §3: «Любые TASK по EPIC-05/06/07 до принятия ADR должны быть `BLOCKED`» |
-| **N-01** — MCP-host не определён | ADR-001 | EPIC-05 (`E05-T01…T28`), EPIC-06 (`E06-T01…T25`) | То же указание реестра (агентный цикл и LLM-хост — предмет ADR-001) |
+| ~~**N-01**~~ — MCP-host не определён | ~~ADR-001~~ | ✅ **СНЯТО** (ADR-001 принят 2026-09-14) | EPIC-07 целиком (`E07-T01…T34`) — ✅ unblocked · EPIC-05 (`E05-T01…T28`) — ✅ unblocked · EPIC-06 (`E06-T01…T25`) — ✅ unblocked |
 | ~~**N-02**~~ — SourceRelation UNIQUE vs `claim_id` | ~~ADR-003~~ | ✅ **СНЯТО** (ADR-003 принят 2026-09-14) | `E02-T09` — ✅ unblocked · `E02-T17` — ✅ unblocked · `E04-T07` — ✅ unblocked |
+
+> ✅ **Все P0-блокеры сняты 2026-09-14** (`ADR-001`, `ADR-002`, `ADR-003` приняты). Таблица сохраняется как история блокировок; перечисленные задачи разблокированы.
 
 > `S-11` (`independent_source_count`) — ожидание `ADR-003` **снято 2026-09-14**: формула `independent_source_count(claim)` уже определена в `01` §7, требование к подсчёту — в `07` §14. Отдельной задачи в декомпозиции не имеет — алгоритм реализуется в составе `E04-T48` (`CoverageCalculator`). Явного указания на это в задаче нет, поэтому связь не фиксируется (`S-14`, вариант «только явные связи»).
 
