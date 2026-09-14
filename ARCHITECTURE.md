@@ -186,7 +186,7 @@ research-prompt-suite/
 ├── docs/                               # Нормативные документы проекта
 │   ├── tz/                             # Копия/ссылка на разделы 01–07 ТЗ v2.4
 │   ├── contracts/                      # STATE MACHINE SPEC, MCP TOOL CONTRACTS, BUDGET CONTRACT, TASK EXECUTION CONTRACT
-│   ├── adr/                            # Architecture Decision Records (см. SUGGESTIONS.md)
+│   ├── adr/                            # Architecture Decision Records (см. `INDEX.md` §7, `REVIEW-REGISTRY.md`)
 │   └── ARCHITECTURE.md                 # Этот документ (каноническая копия)
 │
 ├── tests/                              # pytest, изолированные фикстуры (EPIC-01, Gate G-01..G-11)
