@@ -157,11 +157,11 @@ QA выполняется параллельно каждому EPIC.
 
 **Ключевые сущности:** Project, Study, ResearchIntent, ResearchSession, SearchTask, SearchResult, Source, SourceRelation, Entity, Document, DocumentChunk, StudyDocumentLink, Evidence, EvidenceContextChunk, Observation, Claim, ClaimEvidence, Contradiction, ResearchGap, SufficiencyEvaluation, ResearchConfig, ResearchState, WorkingMemory, CacheEntry, LogRecord, Job.
 
-**Нормализованные таблицы (A-03):** EntityAlias, IntentEntity, IntentInformationNeed, IntentConstraint, IntentSourcePreference, IntentOutputRequirement, SourceIdentifier, SearchResultIdentifier, ChunkNumericSignature, DocumentSourceOccurrence, SourceQualityAssessment, SufficiencyMetric, SufficiencyRuleHit, BudgetLimit, BudgetCounter, BudgetReservation, BudgetLedger, OutboxEvent — реализуются в EPIC-02.
+**Нормализованные таблицы (`A-03`):** EntityAlias, IntentEntity, IntentInformationNeed, IntentConstraint, IntentSourcePreference, IntentOutputRequirement, SourceIdentifier, SearchResultIdentifier, ChunkNumericSignature, DocumentSourceOccurrence, SourceQualityAssessment, SufficiencyMetric, SufficiencyRuleHit, BudgetLimit, BudgetCounter, BudgetReservation, BudgetLedger, OutboxEvent — реализуются в EPIC-02.
 
-**Синхронизация с реестром (Q-01):** Project DB — источник истины; синхронизация registry.db выполняется через transactional outbox (OutboxEvent в той же транзакции + идемпотентный Registry Writer + reconciliation). Snapshot manifest не является crash-atomic; восстановление проверяет manifest и выполняет outbox reconciliation.
+**Синхронизация с реестром (`Q-01`):** Project DB — источник истины; синхронизация registry.db выполняется через transactional outbox (OutboxEvent в той же транзакции + идемпотентный Registry Writer + reconciliation). Snapshot manifest не является crash-atomic; восстановление проверяет manifest и выполняет outbox reconciliation.
 
-**Durability (A-11):** synchronous=FULL для записи, foreign_keys=ON на каждом соединении, backup через SQLite Backup API, мониторинг WAL/свободного места.
+**Durability (`A-11`):** synchronous=FULL для записи, foreign_keys=ON на каждом соединении, backup через SQLite Backup API, мониторинг WAL/свободного места.
 
 ### Требование FTS5/BM25 readiness
 
@@ -241,9 +241,9 @@ RetrievalTextNormalizer
 - выбор tokenizer должен подтверждаться тестами/benchmark на целевом корпусе;
 - fallback на BasicTokenizer должен быть допустимым и явно диагностируемым.
 
-Примечание (A-01): пропуски номеров подэтапов (8, 10) в списке EPIC-04 — техническое следствие нумерации, а **не отсутствующие требования**. Обоснование и критерий приёмки нормы — §21.1 настоящего документа.
+Примечание (`A-01`): пропуски номеров подэтапов (8, 10) в списке EPIC-04 — техническое следствие нумерации, а **не отсутствующие требования**. Обоснование и критерий приёмки нормы — §21.1 настоящего документа.
 
-Границы ответственности (A-16): EPIC-04 предоставляет чистые типизированные primitives (coverage, sufficiency, budget); EPIC-05 вызывает их и не реализует второй evaluator.
+Границы ответственности (`A-16`): EPIC-04 предоставляет чистые типизированные primitives (coverage, sufficiency, budget); EPIC-05 вызывает их и не реализует второй evaluator.
 
 Не следует фиксировать в Roadmap конкретный Python API или конкретный morphology engine до проверки совместимости с целевой SQLite/FTS5 реализацией.
 
@@ -407,7 +407,7 @@ MCP не имеет права самостоятельно:
 
 **Подэтапы:** application shell; project/study creation; project switching через Project Registry; Intent Blueprint; X-Ray Activity Stream; Evidence Explorer/Tree; Report Viewer; Dashboard/Health; Snapshot/Offline; Review/Aggregation UI; cooperative cancellation.
 
-**Кооперативная отмена (A-14):** применяется в GUI-слое — cancellation token + ограниченные батчи; unsafe thread kill запрещён; неотменяемые CPU-библиотеки выносятся в дочерний процесс без DB-write (см. раздел 6 ТЗ, §9 и раздел 4 ТЗ, §28).
+**Кооперативная отмена (`A-14`):** применяется в GUI-слое — cancellation token + ограниченные батчи; unsafe thread kill запрещён; неотменяемые CPU-библиотеки выносятся в дочерний процесс без DB-write (см. раздел 6 ТЗ, §9 и раздел 4 ТЗ, §28).
 
 **Правило:** Main Thread не выполняет тяжёлый retrieval, parsing, indexing или orchestration.
 
@@ -600,9 +600,9 @@ Gate
 
 Дополнительно нормы закрепляют следующее:
 
-- **Версия Roadmap (A-01):** версия документа трактуется как 1.2.
-- **Пропуски нумерации подэтапов (A-01):** пропуски номеров подэтапов (8, 10) в списке EPIC-04 — техническое следствие нумерации, а **не отсутствующие требования**.
-- **Граф зависимостей EPIC (A-01):** архитектурной зависимости EPIC-06 от EPIC-05 нет; gated-порядок сохраняется.
+- **Версия Roadmap (`A-01`):** версия документа трактуется как 1.2.
+- **Пропуски нумерации подэтапов (`A-01`):** пропуски номеров подэтапов (8, 10) в списке EPIC-04 — техническое следствие нумерации, а **не отсутствующие требования**.
+- **Граф зависимостей EPIC (`A-01`):** архитектурной зависимости EPIC-06 от EPIC-05 нет; gated-порядок сохраняется.
 
 ### 21.2. Прочие нормы состава УИ v1.0
 

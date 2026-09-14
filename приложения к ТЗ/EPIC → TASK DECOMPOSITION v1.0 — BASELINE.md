@@ -266,7 +266,7 @@ CODE / TEST / REVIEW
 
 # 7. EPIC-05 — RESEARCH ENGINE
 
-Примечание (A-01): архитектурной зависимости EPIC-06 от EPIC-05 нет; фактический gated-порядок сохраняется. Определение нормы — `MASTER DEVELOPMENT ROADMAP v1.2` §21.1. Примечание (A-16): EPIC-05 вызывает typed primitives EPIC-04 (coverage/sufficiency/budget, группы R8–R9) и не реализует второй SufficiencyEvaluator; G-05 проверяется через FakeLLM.
+Примечание (`A-01`): архитектурной зависимости EPIC-06 от EPIC-05 нет; фактический gated-порядок сохраняется. Определение нормы — `MASTER DEVELOPMENT ROADMAP v1.2` §21.1. Примечание (`A-16`): EPIC-05 вызывает typed primitives EPIC-04 (coverage/sufficiency/budget, группы R8–R9) и не реализует второй SufficiencyEvaluator; G-05 проверяется через FakeLLM.
 
 ### Group RE1 — Research configuration
 

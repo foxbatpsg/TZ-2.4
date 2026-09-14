@@ -64,13 +64,13 @@ LogRecord
 Job
 ```
 
-Нормализованные таблицы (A-03): `EntityAlias`, `IntentEntity`, `IntentInformationNeed`, `IntentConstraint`, `IntentSourcePreference`, `IntentOutputRequirement`, `SourceIdentifier`, `SearchResultIdentifier`, `ChunkNumericSignature`, `DocumentSourceOccurrence`, `SourceQualityAssessment`, `SufficiencyMetric`, `SufficiencyRuleHit`, `BudgetLimit`, `BudgetCounter`, `BudgetReservation`, `BudgetLedger`, `OutboxEvent`.
+Нормализованные таблицы (`A-03`): `EntityAlias`, `IntentEntity`, `IntentInformationNeed`, `IntentConstraint`, `IntentSourcePreference`, `IntentOutputRequirement`, `SourceIdentifier`, `SearchResultIdentifier`, `ChunkNumericSignature`, `DocumentSourceOccurrence`, `SourceQualityAssessment`, `SufficiencyMetric`, `SufficiencyRuleHit`, `BudgetLimit`, `BudgetCounter`, `BudgetReservation`, `BudgetLedger`, `OutboxEvent`.
 
-Стабильные идентификаторы (A-07): `DocumentChunk.chunk_id` детерминирован относительно document identity + версии chunker + позиции; смена версии разбиения (chunk_size/параметры) не ломает существующую доказательную базу — новые версии разбиения создают новые chunk_id без перезаписи существующих.
+Стабильные идентификаторы (`A-07`): `DocumentChunk.chunk_id` детерминирован относительно document identity + версии chunker + позиции; смена версии разбиения (chunk_size/параметры) не ломает существующую доказательную базу — новые версии разбиения создают новые chunk_id без перезаписи существующих.
 
-Синхронизация реестра (Q-01): Project DB — источник истины; registry.db синхронизируется через transactional outbox (событие в той же транзакции + идемпотентный Registry Writer + reconciliation); мультифайловый snapshot не объявляется crash-atomic.
+Синхронизация реестра (`Q-01`): Project DB — источник истины; registry.db синхронизируется через transactional outbox (событие в той же транзакции + идемпотентный Registry Writer + reconciliation); мультифайловый snapshot не объявляется crash-atomic.
 
-Durability (A-11): `synchronous=FULL` для записи, `foreign_keys=ON` на каждом соединении, backup через SQLite Backup API, мониторинг WAL/свободного места.
+Durability (`A-11`): `synchronous=FULL` для записи, `foreign_keys=ON` на каждом соединении, backup через SQLite Backup API, мониторинг WAL/свободного места.
 
 Схема должна быть архитектурно готова к FTS5/BM25 для DocumentChunk.
 
@@ -127,7 +127,7 @@ RetrievalTextNormalizer
 
 **Gate G-04:** retrieval детерминирован; deduplication и query fingerprint работают; FTS5/BM25 согласован с DocumentChunk; lifecycle индекса корректен; evidence provenance, budget, cache и normalizer versioning работают.
 
-Граница ответственности (A-16): EPIC-04 предоставляет чистые типизированные primitives (coverage, sufficiency, budget); второй evaluator в других эпиках не реализуется. G-04 проверяется на fixtures без реальной LLM.
+Граница ответственности (`A-16`): EPIC-04 предоставляет чистые типизированные primitives (coverage, sufficiency, budget); второй evaluator в других эпиках не реализуется. G-04 проверяется на fixtures без реальной LLM.
 
 ---
 
@@ -143,7 +143,7 @@ Core владеет task acceptance, duplicate/similar query checks, budget, cov
 
 **Gate G-05:** mock-LLM E2E проходит `intent → plan → tasks → retrieval → evidence → gap → next task → sufficiency → finalize`.
 
-Примечание (A-16): Research Engine вызывает typed primitives EPIC-04 и не реализует второй SufficiencyEvaluator; G-05 проверяется через FakeLLM. Примечание (A-01): архитектурной зависимости EPIC-06 от EPIC-05 нет; gated-порядок сохраняется. Определение нормы — `MASTER DEVELOPMENT ROADMAP v1.2` §21.1.
+Примечание (`A-16`): Research Engine вызывает typed primitives EPIC-04 и не реализует второй SufficiencyEvaluator; G-05 проверяется через FakeLLM. Примечание (`A-01`): архитектурной зависимости EPIC-06 от EPIC-05 нет; gated-порядок сохраняется. Определение нормы — `MASTER DEVELOPMENT ROADMAP v1.2` §21.1.
 
 ---
 
