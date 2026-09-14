@@ -37,7 +37,7 @@ TASK (карточка задачи для агента)
 | Хранилище | **SQLite (WAL-режим)** | Единый DB-write layer, `PRAGMA synchronous=FULL`, `foreign_keys=ON` на каждом соединении |
 | Полнотекстовый локальный поиск | **BM25** (`rank_bm25` или **SQLite FTS5**) | Обязателен CPU-only baseline; MVP gate |
 | Морфология RU | **pymorphy3 / pymorphy2** (RussianMorphologyNormalizer) | Обязательна для MVP (A-13), не опциональна |
-| Локальный LLM-рантайм | **Ollama**, **LM Studio** (OpenAI-compatible HTTP API), совместимые local HTTP backends | Модели класса 12–14B, GGUF, квантование Q4_K_M/Q5_K_M, движок llama.cpp |
+| Локальный LLM-рантайм | **Ollama**, **LM Studio** (OpenAI-compatible HTTP API), совместимые local HTTP backends | Минимальный класс 12–14B (A-22), верхняя граница не нормирована; GGUF, квантование Q4_K_M/Q5_K_M, движок llama.cpp |
 | Протокол вызова инструментов Core | **MCP (Model Context Protocol, Anthropic)** поверх **stdio / JSON-RPC** | MCP — протокол **вызова инструментов**, а не инференса (`02` §3a, ADR-001); `stdout` зарезервирован строго под JSON-RPC |
 | Конкурентность | **asyncio** (Worker Thread) + Main Thread (GUI) | Обмен через `asyncio.run_coroutine_threadsafe`, `queue.Queue`, `root.after()` |
 | Валидация схем | **pydantic** / JSON Schema | Валидация ResearchIntent, MCP tool input/output, structured LLM output |
