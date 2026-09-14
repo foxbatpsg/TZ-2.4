@@ -120,6 +120,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | **Q-05** | Межавтоматная policy при восстановлении после recovery | `01` §2.3, стр. 115 | — | закрыто |
 | **Q-06…Q-07** | ⟂ **ПРОПУСК НУМЕРАЦИИ** | — | не найдены в корпусе | `status: gap` — см. §9 D-2 |
 | **Q-08** | Версионирование Document при смене URL (механизм A-21) | `03` §9b (ADR-002, принят 2026-09-14) | `07` §17 стр.249; `04` §25; `MCP TOOL CONTRACTS` §3 | ✅ **CLOSED** (ADR-002, 2026-09-14) — S-12 RESOLVED |
+| **Q-10** | Приватные данные в поисковых запросах (query egress) | `05` §3.3 — норма «Query egress policy (Q-10)» | карточки Astra1: Глава 4, 5, 6, 10 (блокеры) | ✅ **CLOSED** (2026-09-15 — принято из черновика v1.1, вариант A, default `PUBLIC_ONLY`) |
 | **Q-11** | Перенос Study / откат snapshot | `06` §13 — норма «Перенос Study и откат (Q-11)» | карточки Astra1: Глава 2, 8 (блокеры) | ✅ **CLOSED** (2026-09-15 — принято из черновика v1.1) |
 | **Q-13** | Administrator diagnostic token | `EPIC SPECIFICATIONS v1.0` §12, `MASTER ROADMAP v1.2` §14, `EPIC→TASK` §13 | — | ✅ **CLOSED** (2026-09-13) — **не вводится в MVP** |
 
@@ -241,6 +242,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | Профили исполнения и владелец агентного цикла | `02` §3a; `05` §3 | — | **N-01 ✅ CLOSED (ADR-001, 2026-09-14)** |
 | MCP-транспорт и 23 инструмента | `05` §3–4 | MCP TOOL CONTRACTS v1.1 | **N-01 ✅ CLOSED (ADR-001, 2026-09-14)** |
 | Egress policy (недоверенные адреса) | `05` §3.2; `07` §24 | — | **N-03 ✅ CLOSED (2026-09-14)** |
+| Query egress policy (приватное содержимое запросов) | `05` §3.3; `07` §24 | — | **Q-10 ✅ CLOSED (2026-09-15)** |
 | Query Fingerprint и защита от дублей | `04` §20 | — | A-04 |
 | Дедупликация (3 уровня) | `04` §8 | — | — |
 | Chunking и overlap | `03` §11–12; `04` §13 | — | A-06, A-07 |
