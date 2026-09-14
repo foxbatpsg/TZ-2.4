@@ -38,7 +38,7 @@ TASK (карточка задачи для агента)
 | Полнотекстовый локальный поиск | **BM25** (`rank_bm25` или **SQLite FTS5**) | Обязателен CPU-only baseline; MVP gate |
 | Морфология RU | **pymorphy3 / pymorphy2** (RussianMorphologyNormalizer) | Обязательна для MVP (A-13), не опциональна |
 | Локальный LLM-рантайм | **Ollama**, **LM Studio** (OpenAI-compatible HTTP API), совместимые local HTTP backends | Модели класса 12–14B, GGUF, квантование Q4_K_M/Q5_K_M, движок llama.cpp |
-| Протокол LLM ↔ Core | **MCP (Model Context Protocol, Anthropic)** поверх **stdio / JSON-RPC** | `stdout` зарезервирован строго под JSON-RPC |
+| Протокол вызова инструментов Core | **MCP (Model Context Protocol, Anthropic)** поверх **stdio / JSON-RPC** | MCP — протокол **вызова инструментов**, а не инференса (`02` §3a, ADR-001); `stdout` зарезервирован строго под JSON-RPC |
 | Конкурентность | **asyncio** (Worker Thread) + Main Thread (GUI) | Обмен через `asyncio.run_coroutine_threadsafe`, `queue.Queue`, `root.after()` |
 | Валидация схем | **pydantic** / JSON Schema | Валидация ResearchIntent, MCP tool input/output, structured LLM output |
 | Тестирование | **pytest**, фикстуры, изолированные временные БД | Тесты не зависят от сети и от реальной LLM (кроме явных live-тестов) |
@@ -54,7 +54,7 @@ TASK (карточка задачи для агента)
 
 ### 1.4. Архитектурные ограничения (жёсткие, из ТЗ)
 
-1. **Монолит с жёсткими внутренними слоями**, а не микросервисы. Единый процесс приложения, единый DB-write layer, один активный MCP stdio-сервер на процесс.
+1. **Монолит с жёсткими внутренними слоями**, а не микросервисы. Единый процесс приложения, единый DB-write layer, **один процесс ядра на файл Project DB** (второй запуск → `PROJECT_LOCKED`; профили исполнения — `02` §3a).
 2. **CPU-Independent (GPU-Independent) baseline** — MVP обязан работать без GPU. GPU/векторные провайдеры — опциональное расширение.
 3. **Data isolation per Project** — каждый Project — отдельный файл SQLite; кросс-проектная видимость только через `registry.db` (реестр), без прямого доступа к содержимому чужого проекта.
 4. **LLM ≠ источник фактов.** LLM — вычислительный слой интерпретации и синтеза. Любое утверждение без опоры на Evidence Store — галлюцинация, отбрасывается на этапе валидации.
@@ -138,7 +138,7 @@ research-prompt-suite/
 │   ├── token_budget_manager.py       # Интеграция с core/budget (llm_call/llm_token dimensions)
 │   └── prompt/                       # Сборка компактного контекста (без сырых HTML/полных страниц)
 │
-├── mcp_server/                       # MCP stdio-сервер (EPIC-07) — единственная точка входа LLM в Core
+├── mcp_server/                       # MCP-сервер (EPIC-07): транспорт профиля headless --mcp-stdio, контракты 23 инструментов
 │   ├── server.py                     # stdio transport, ранний редирект логгеров, guard от левого stdout
 │   ├── transport_guard.py            # Валидирующая обёртка: в stdout идёт только корректный JSON-RPC
 │   ├── tools/                        # 23 инструмента по группам (MCP TOOL CONTRACTS v1.1)
@@ -337,7 +337,11 @@ BudgetLimit / BudgetCounter / BudgetReservation / BudgetLedger
 
 ### 4.1. Внутренний транспорт: MCP поверх stdio
 
-Единственный канал, которым LLM обращается к Core — **Model Context Protocol** (JSON-RPC поверх `stdio`). Прямых импортов Core внутри промптов/кода LLM не существует. Полный реестр — 23 инструмента (`MCP TOOL CONTRACTS v1.1`):
+**MCP — протокол вызова инструментов, а не протокол инференса** (`02` §3a, ADR-001). Любой вызов инструмента Core проходит через MCP-контракт инструмента; обращение к LLM идёт отдельным каналом — OpenAI-compatible HTTP API (`05` §1–2). Прямых импортов Core внутри промптов/кода LLM не существует.
+
+Профили исполнения (`02` §3a): **desktop orchestration** (по умолчанию) — агентный цикл ведёт Orchestrator в процессе приложения, вызовы инструментов идут в единый ToolDispatcher; **headless `--mcp-stdio`** — агентный цикл ведёт внешний MCP-клиент, stdio-адаптер транслирует вызовы в тот же ToolDispatcher. Состав инструментов в обоих профилях одинаков.
+
+Полный реестр — 23 инструмента (`MCP TOOL CONTRACTS v1.1`):
 
 | Группа | Инструменты |
 |---|---|
