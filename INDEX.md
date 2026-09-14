@@ -248,7 +248,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | TokenBudgetManager | `02` §6a; `05` §11a | — | A-12 |
 | Structured output (2 уровня валидации) | `05` §10 | — | **N-03 ✅ CLOSED (2026-09-14)** |
 | Error Contract | `05` §16 | — | A-19 |
-| Watchdog и таймауты | `05` §17 | — | **S-10** |
+| Watchdog и таймауты | `02` §7; `05` §17 | — | **S-10 ✅ CLOSED (2026-09-14)** |
 | Кооперативная отмена | `06` §9; `04` §28 | — | A-14 |
 | DB-write layer | `03` §21 | — | **S-17** |
 | registry.db и outbox | `03` §25.2–25.3 | — | Q-01, A-09 |
