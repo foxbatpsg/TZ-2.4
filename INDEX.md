@@ -68,7 +68,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 
 ---
 
-## 3. Реестр норм A-01…A-22
+## 3. Реестр норм A-01…A-23
 
 > Формат определения в ТЗ единообразен: `Название нормы (A-N): текст`. Поле `canonical` указывает первичный источник; `mentions` — остальные места применения.
 > **A-01 восстановлен и внесён в нормативный состав** (2026-09-13): каноническая формулировка найдена в старых файлах проекта, затем внесена в нормативный реестр — `MASTER DEVELOPMENT ROADMAP v1.2 — BASELINE.md` §21.1 (УИ v1.0), с сохранением источника, обоснования и критерия приёмки. См. `REVIEW-REGISTRY.md` §D-4. Статус — `active`.
@@ -97,6 +97,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | **A-20** | Runtime stdout protection: перехват постороннего вывода без разрушения транспорта | `05` §3.1, стр. 54 | `07` §19.1 стр.292 | **S-04 (ACCEPT)** |
 | **A-21** | Неизменяемость Document; обновление URL/контента создаёт новую версию | `03` §9, стр. 291 | `03` стр.327; `04` §14a стр.312; `07` §17 стр.249 | **S-12 / Q-08 (P0, ACCEPT)** |
 | **A-22** | Минимально поддерживаемый класс LLM: 12–14B Q4/Q5 (GGUF); верхней границы не установлено | `02` §5.3, стр. 155 | `02` §5.1 стр.134; `02` §6 стр.161; `05` §1 стр.13; `07` §25 стр.393; `ARCHITECTURE.md` стр.40 | — |
+| **A-23** | Расширяемость ретривал-хранения: векторное хранение — боковая таблица `ChunkEmbedding` рядом с `DocumentChunk`, append-only миграция | `03` §11, стр. 374 | `02` §5.2 стр.138 | — |
 
 **Замечания по реестру:**
 
@@ -151,6 +152,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | **`Document`** | `03` §9 | `content_hash` UNIQUE; неизменяемость (A-21); механизм версионирования — `03` §9b (Q-08 ✅ CLOSED, ADR-002) | *↔* Study via StudyDocumentLink |
 | `DocumentSourceOccurrence` | `03` §9a | 5 копий → 1 тело + 5 происхождений (A-08) | → Document, → Source |
 | `DocumentChunk` | `03` §11 | `chunk_id` детерминирован (A-07); интервалы (A-06) | 1→* Evidence |
+| `ChunkEmbedding` | `03` §11 | **Зарезервировано, вне MVP** (A-23, `07` §26): боковая таблица, FK → `DocumentChunk`, append-only миграция (S-17) | → DocumentChunk |
 | `Evidence` | `03` §13 | `evidence_hash` UNIQUE; проверка по позиции (A-05) | *↔* Chunk, → Source |
 | `EvidenceContextChunk` | `03` §13a | Контекстное окружение ±1 чанк | → Evidence, → DocumentChunk |
 | `Observation` | `03` §14 | — | → Study |
