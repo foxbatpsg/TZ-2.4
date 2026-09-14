@@ -256,7 +256,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | Приватная диагностика сбоев | `02` §7 (полная норма); `07` §24 | — | **S-06 (ACCEPT, 2026-09-13)** |
 | Административный диагностический доступ | `02` §8 (ссылка на решение) | EPIC SPECIFICATIONS §12 | **Q-13 (CLOSED, 2026-09-13) — не вводится в MVP** |
 | Согласованный baseline документов | `07` §27.2 | — | **S-09 (ACCEPT, 2026-09-14)** |
-| Partial report / FULL-PARTIAL | `05` §15; `06` §8 | STATE MACHINE SPEC §1 | **S-08** |
+| Partial report / FULL-PARTIAL | `05` §15; `06` §8 | STATE MACHINE SPEC §1 | **S-08 ✅ CLOSED (2026-09-14)** |
 | stdout protection | `05` §3.1; `07` §19.1 | — | A-20, **S-04** |
 | Post-MVP список (отложенные механизмы) | `07` §26 | — | **S-03** (хранение API-ключей, `DEFER`) |
 | Версионирование Document (механизм A-21) | `03` §9b; `04` §25 | MCP TOOL CONTRACTS v1.1 §3 | **Q-08 (CLOSED, ADR-002, 2026-09-14)** |

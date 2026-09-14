@@ -150,6 +150,8 @@ Smart scroll:
 - если пользователь читает выше конца, auto-scroll отключается;
 - отображается кнопка перехода к концу.
 
+Единая схема результата (S-08): завершённый Study обязательно несёт `result.completion_kind: FULL | PARTIAL` с полями `reason_codes` и `gaps`; для активного Study поле `result` отсутствует. GUI, dashboard, MCP и все экспортёры читают одну и ту же схему — различие FULL/PARTIAL не теряется при смене представления. `PARTIAL` — признак результата (result status), не состояние Study (STATE MACHINE SPECIFICATION v1.2).
+
 ---
 
 ## 9. Graceful Abort

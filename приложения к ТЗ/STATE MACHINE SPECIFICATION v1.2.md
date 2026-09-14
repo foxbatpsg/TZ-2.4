@@ -332,7 +332,7 @@ RUNNING
 CREATED → VALIDATING → REJECTED_BUDGET
 ```
 
-Итоговый отчёт помечается как partial через metadata/result status, но `PARTIAL_REPORT` не становится состоянием Study.
+Итоговый отчёт помечается как partial через metadata/result status, но `PARTIAL_REPORT` не становится состоянием Study. Различение FULL/PARTIAL (S-08) выполняется полем `result.completion_kind: FULL | PARTIAL` — обязательным для завершённого результата, с `reason_codes` и `gaps`; FSM бизнес-статусов этим не расширяется.
 
 ### Partial Finalize (из USER_STOPPED)
 
