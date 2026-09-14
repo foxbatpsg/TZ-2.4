@@ -163,6 +163,8 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | `LogRecord` | `03` §2 | Audit всех переходов FSM | → (entity_type, entity_id) |
 | `Job` | `03` §2 | FSM Job; кооперативная отмена (A-14) | → Study |
 
+| **Q-08** | Версионирование Document при смене URL (механизм A-21) | `03` §9b (ADR-002, принят 2026-09-14) | `07` §17 стр.249, `04` §25, `MCP TOOL CONTRACTS` §3 | canonical: `03` §9b · mentions: `07` §17, `04` §25, `MCP TOOL CONTRACTS` §3 | closed |
+| **Q-06…Q-07** | ⟂ пропуск нумерации | — | — | `status: gap` |
 ---
 
 ## 6. Карта Gate G-01…G-11
@@ -205,6 +207,15 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | **EPIC-10** | FINAL QA / ACCEPTANCE | G-10 | `E10-T01…T19` | — | `tests/` (golden, integration) |
 | **EPIC-11** | PACKAGING / PORTABLE | G-11 | `E11-T01…T18` | — | `packaging/`, env checker |
 
+**ADR-контур:**
+
+| ADR | Предмет | Блокер | Влияет на |
+|---|---|---|---|
+| **ADR-001** | MCP-host и владелец агентного цикла (профили desktop orchestration / headless `--mcp-stdio`) | `N-01` (P0) | EPIC-05, EPIC-06, EPIC-07 |
+| **ADR-002** ✅ Accepted 2026-09-14 | Идентичность Document при смене URL: идемпотентное окно 24ч, флаг `refresh=true` в `read_url_content`, Evidence фиксирует версию (A-21), `CONTENT_UNCHANGED` при совпадении hash | `S-12` / `Q-08` (P0) → **CLOSED** | EPIC-02, EPIC-04 (E02-T10, E02-T20, E04-T33/34/35 — ✅ unblocked) |
+| **ADR-003** | `SourceRelation` UNIQUE vs `claim_id` | `N-02` (P0) | EPIC-02, EPIC-04 |
+
+> ADR-002 принят 2026-09-14 (черновик Q-08 из корзины утверждён). ADR-001, ADR-003 — `Proposed`, зависимые задачи `BLOCKED` до `Accepted`.
 **ADR-контур (статус: `Proposed`, не приняты):**
 
 | ADR | Предмет | Блокер | Влияет на |
@@ -257,6 +268,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | Partial report / FULL-PARTIAL | `05` §15; `06` §8 | STATE MACHINE SPEC §1 | **S-08** |
 | stdout protection | `05` §3.1; `07` §19.1 | — | A-20, **S-04** |
 | Post-MVP список (отложенные механизмы) | `07` §26 | — | **S-03** (хранение API-ключей, `DEFER`) |
+| Версионирование Document (механизм A-21) | `03` §9b; `04` §25 | MCP TOOL CONTRACTS v1.2 §3 | **Q-08 (CLOSED, ADR-002, 2026-09-14)** |
 
 ---
 
@@ -267,6 +279,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | **D-1** | `A-13` (RU-морфология обязательна) ↔ `EPIC-10` Coverage: «Russian morphology **если включена**» | `EPIC SPECIFICATIONS v1.0` стр. 228 | ✅ **CLOSED** (2026-09-13) — приведено к формулировке `A-13`/`MASTER ROADMAP` §13 |
 | **D-2** | Q-06, Q-07 отсутствуют — пропуск нумерации без пояснения | весь корпус | требует пояснения (по аналогии с `MASTER ROADMAP` стр.244) |
 | **D-3** | `A-01` входил в нормативный набор «УИ v1.0» без определения | приложения, 5 примечаний | ✅ **CLOSED** (2026-09-13) — формулировка внесена в нормативный состав: `MASTER ROADMAP v1.2` §21.1. См. D-4 |
+| — | ~~**Q-08** — версионирование Document при смене URL~~ | ~~`07` §17 стр.249~~ | ✅ **CLOSED** (ADR-002, 2026-09-14: черновик Q-08 утверждён; механизм в `03` §9b, `04` §25, `MCP TOOL CONTRACTS` §3; A-21 не изменён); S-12 |
 | **D-4** | ⚠ Дубли определений: A-03 (×7), A-02/A-10/A-21/Q-04 (×4) — расхождение акцентов | `03`, `04`, `05`, `01` | требует назначения `canonical` при переходе к варианту 2 |
 | **D-5** | `Q-13` использовался вне нормативного корпуса (карточки Astra1) как блокер, но в реестре `Q-01…Q-08` отсутствовал | карточки Astra1: 5 упоминаний | ✅ **CLOSED** (2026-09-13) — решение принято, diagnostic token снят из MVP. См. §4 `Q-13` |
 | — | **Q-08** — версионирование Document при смене URL | `07` §17 стр.249 | **P0-блокер**, S-12 |
@@ -279,6 +292,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 
 | Блокер | ADR | Заблокированные задачи | Основание |
 |---|---|---|---|
+| ~~**S-12 / Q-08**~~ — Document identity при смене URL | ~~ADR-002~~ | ✅ **СНЯТО** (ADR-002 принят 2026-09-14) | `E02-T10` — ✅ unblocked · `E02-T20` — ✅ unblocked · `E04-T33` — ✅ unblocked · `E04-T34` — ✅ unblocked · `E04-T35` — ✅ unblocked |
 | **N-01** — MCP-host не определён | ADR-001 | **EPIC-07 целиком** (`E07-T01…T34`), в первую очередь группа `M1 — Transport/core boundary` (`E07-T01…T05`) | `REVIEW-REGISTRY.md` §3: «Любые TASK по EPIC-05/06/07 до принятия ADR должны быть `BLOCKED`» |
 | **N-01** — MCP-host не определён | ADR-001 | EPIC-05 (`E05-T01…T28`), EPIC-06 (`E06-T01…T25`) | То же указание реестра (агентный цикл и LLM-хост — предмет ADR-001) |
 | **S-12 / Q-08** — Document identity при смене URL | ADR-002 | `E02-T10` (Document/DocumentChunk/StudyDocumentLink schema), `E02-T20` (global Document reuse) | Схема и переиспользование Document — прямой предмет конфликта `content_hash` UNIQUE |
@@ -328,6 +342,16 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
   title: "Версионирование Document при смене URL"
   status: open
   verdict: "S-12 (P0) — требует ADR-002"
+- id: Q-08
+  canonical: "03_Модель данных и хранение.md §9b (ADR-002, принят 2026-09-14)"
+  title: "Версионирование Document при смене URL"
+  text: "Идемпотентное окно 24 часа; флаг refresh=true в read_url_content (MCP TOOL CONTRACTS §3) — явный механизм принудительного обновления (отдельный refresh-tool не вводится); Evidence фиксирует версию Document (A-21); EXPAND использует последнюю доступную версию; при совпадении content_hash новая версия не создаётся (CONTENT_UNCHANGED). A-21 не изменён — механизм операционализирует его нормативную формулировку."
+  mentions: [ "07_QA_Acceptance.md §17", "04_Search Core.md §25", "MCP TOOL CONTRACTS v1.2 §3" ]
+  conflicts: []
+  gates: [G-04, G-07]
+  epics: [EPIC-02, EPIC-04, EPIC-07]
+  status: closed
+  verdict: "S-12 (RESOLVED) — ADR-002 принят 2026-09-14, черновик Q-08 из корзины утверждён; A-21 согласован"
   blocks: [ "TASK по Document.version", "TASK по URL update" ]
 
 - id: Q-13
