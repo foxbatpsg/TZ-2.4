@@ -1,7 +1,7 @@
 ---
 # MCP TOOL CONTRACTS v1.1
 
-**Статус:** Нормативное приложение к ТЗ v2.5  
+**Статус:** Нормативное приложение к ТЗ v2.6
 **Назначение:** Детальные контракты 23 MCP-инструментов MVP.  
 **Приоритет:** Этот документ уточняет и заменяет неоднозначные места версии v1.0.
 
@@ -172,10 +172,10 @@ CREATED → VALIDATING → QUEUED → RUNNING
 
 | Поле | Контракт |
 |---|---|
-| INPUT | `study_id`, `document_id`, `query`, `limit` |
-| OUTPUT | `chunks[]: chunk_id, text_snippet, relevance_score, position_index` |
+| INPUT | `study_id`, `document_id`, `query`, `limit`, `include_evidence_context` (default `true`) |
+| OUTPUT | `chunks[]: chunk_id, text_snippet, relevance_score, position_index`; при `include_evidence_context = true` — `document_version`, коридор ±1: ID и интервалы `[char_start, char_end)` целевого и соседних чанков, точный текст фрагментов (`04` §15/§15.1) |
 | ERRORS | `INVALID_INPUT`, `RETRIEVAL_PROVIDER_ERROR`, `DATABASE_ERROR` |
-| LIMITS | 20 items; 8 KiB |
+| LIMITS | 20 items; 32 KiB с контекстом (стартовое значение; окончательное подтверждается тестами) |
 | TIMEOUT | 30 с |
 | RETRY | нет |
 | SIDE EFFECTS | нет |
@@ -184,6 +184,8 @@ CREATED → VALIDATING → QUEUED → RUNNING
 | AUTHORITY | LLM инициирует; Core проверяет принадлежность Document Study и выполняет |
 
 Изоляция Study обязательна через `StudyDocumentLink`.
+
+Контекст доказательства (`Q-06`, `05` §4b): при `include_evidence_context = true` ответ обязан содержать идентификатор и версию Document, целевой чанк и соседние чанки коридора ±1, их ID, интервалы `[char_start, char_end)` и точный текст. Сборка коридора и устранение дублирования — `04` §15/§15.1. Превышение лимита — `RESPONSE_TOO_LARGE`. Передача коридора через `save_study_material` запрещена (`05` §4b, п. 3).
 
 ---
 
@@ -224,6 +226,8 @@ CREATED → VALIDATING → QUEUED → RUNNING
 Допустимые `material_type`:
 
 `EVIDENCE`, `OBSERVATION`, `CLAIM`, `CONTRADICTION`, `GAP`.
+
+`save_study_material` не используется как механизм передачи полного контекста доказательства: лимит 4 KiB — ограничение payload сохраняемой сущности (`Q-06`, `05` §4b, п. 3).
 
 ### `search_study_materials`
 

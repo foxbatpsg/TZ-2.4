@@ -21,6 +21,10 @@ def row(norm, status="open"):
 
 class StatusTests(unittest.TestCase):
     def setUp(self):
+        # Логика проверяется на паре Q-06/Q-07 независимо от текущего состояния корпуса.
+        patcher = patch.object(validator, "OPEN_QUESTIONS", {"Q-06", "Q-07"})
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.index = "## 4. Реестр решений\n" + row("Q-06") + row("Q-07")
 
     def test_open_questions_without_definitions(self):
@@ -68,16 +72,18 @@ class StatusTests(unittest.TestCase):
                 self.assertTrue(errors)
 
     def test_real_corpus_cli_positive_and_negative(self):
+        # Реальный корпус: действует штатный OPEN_QUESTIONS = {"Q-07"} (Q-06 закрыт).
         original = (ROOT / "INDEX.md").read_text(encoding="utf-8")
         variants = [
             (original, 0),
             (original.replace("`status: open`", "`status: gap`", 1), 1),
             ("\n".join(line for line in original.splitlines()
-                       if not line.startswith("| **Q-06** |")), 1),
+                       if not line.startswith("| **Q-07** |")), 1),
             (original + "\nФантом Q-99\n", 1),
         ]
         # Копируются только перечисленные нормативные файлы, не архив и не карточки.
-        with tempfile.TemporaryDirectory() as directory:
+        with patch.object(validator, "OPEN_QUESTIONS", {"Q-07"}), \
+             tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for rel in validator.CORPUS_FILES + validator.APPENDIX_FILES:
                 target = root / rel
