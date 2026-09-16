@@ -1,13 +1,13 @@
 # ARCHITECTURE.md — Research Prompt Suite
 
-**Источник контекста:** ТЗ v2.4 (репозиторий `foxbatpsg/TZ-2.4`, ветка `master`), включая нормативные приложения `STATE MACHINE SPECIFICATION v1.2`, `BUDGET CONTRACT v1.0`, `MCP TOOL CONTRACTS v1.1`, `EPIC SPECIFICATIONS v1.0`, `EPIC → TASK DECOMPOSITION v1.0`, `MASTER DEVELOPMENT ROADMAP v1.2`, `TASK EXECUTION CONTRACT v1.0`.
+**Источник контекста:** ТЗ v2.5 (репозиторий `foxbatpsg/TZ-2.4`, ветка `master`), включая нормативные приложения `STATE MACHINE SPECIFICATION v1.2`, `BUDGET CONTRACT v1.0`, `MCP TOOL CONTRACTS v1.1`, `EPIC SPECIFICATIONS v1.0`, `EPIC → TASK DECOMPOSITION v1.0`, `MASTER DEVELOPMENT ROADMAP v1.2`, `TASK EXECUTION CONTRACT v1.0`.
 
 **Статус документа:** рабочий архитектурный ориентир для декомпозиции задач между ИИ-агентами (Cline / OpenCode). Документ не заменяет ТЗ и нормативные приложения — при конфликте приоритет имеет ТЗ.
 
 **Иерархия приоритета документов:**
 
 ```
-ТЗ v2.4
+ТЗ v2.5
   ↓
 State Machine Specification v1.2 / MCP Tool Contracts v1.1 / Budget Contract v1.0
   ↓
@@ -147,7 +147,10 @@ research-prompt-suite/
 │   │   ├── reading.py                # read_url_content / read_youtube_transcript
 │   │   ├── documents.py              # add_local_document / search_within_document
 │   │   ├── study_management.py       # start_research_session / save_study_material / search_study_materials / get_research_session_statistics / get_study_dashboard
-│   │   └── memory.py                 # update_working_memory / get_working_memory
+│   │   ├── memory.py                 # update_working_memory / get_working_memory
+│   │   ├── cache_diagnostics.py      # get_cache_statistics / get_cache_diagnostics / cleanup_expired_cache
+│   │   ├── report.py                 # validate_and_save_report
+│   │   └── job_management.py         # get_job_status / cancel_job
 │   ├── schemas/                      # JSON Schema input/output для каждого tool
 │   └── error_codes.py                # Единый формат ошибок MCP (см. раздел 4.3)
 │
@@ -184,7 +187,7 @@ research-prompt-suite/
 ├── packaging/                          # Сборка portable-дистрибутива Windows (PyInstaller)
 │
 ├── docs/                               # Нормативные документы проекта
-│   ├── tz/                             # Копия/ссылка на разделы 01–07 ТЗ v2.4
+│   ├── tz/                             # Копия/ссылка на разделы 01–07 ТЗ v2.5
 │   ├── contracts/                      # STATE MACHINE SPEC, MCP TOOL CONTRACTS, BUDGET CONTRACT, TASK EXECUTION CONTRACT
 │   ├── adr/                            # Architecture Decision Records (см. `INDEX.md` §7, `REVIEW-REGISTRY.md`)
 │   └── ARCHITECTURE.md                 # Этот документ (каноническая копия)
@@ -351,6 +354,9 @@ BudgetLimit / BudgetCounter / BudgetReservation / BudgetLedger
 | Documents | `add_local_document`, `search_within_document` |
 | Study Management | `start_research_session`, `save_study_material`, `search_study_materials`, `get_research_session_statistics`, `get_study_dashboard` |
 | Memory | `update_working_memory`, `get_working_memory` |
+| Cache / Diagnostics | `get_cache_statistics`, `get_cache_diagnostics`, `cleanup_expired_cache` |
+| Report | `validate_and_save_report` |
+| Job Management | `get_job_status`, `cancel_job` |
 
 **Общий контракт каждого tool обязателен и включает:** `INPUT`/`OUTPUT` схему, список `ERRORS`, `LIMITS` (размер ответа/кол-во элементов), `TIMEOUT`, `RETRY`-политику, `SIDE EFFECTS` (какие сущности создаются и какой budget списывается), `IDEMPOTENCY` (формула ключа), `CANCELLATION`, `AUTHORITY` (кто инициирует, кто исполняет).
 
