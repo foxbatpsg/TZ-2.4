@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Валидатор целостности индексного слоя ТЗ v2.4.
+Валидатор целостности индексного слоя ТЗ v2.5.
 
 Проверяет:
   1. Битые ссылки: все упомянутые в INDEX.md разделы/§ существуют в файлах ТЗ.
@@ -125,7 +125,7 @@ def check_index_files_exist(root: Path, index_text: str) -> list[str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Валидатор индексного слоя ТЗ v2.4")
+    parser = argparse.ArgumentParser(description="Валидатор индексного слоя ТЗ v2.5")
     parser.add_argument("--root", default=".", help="Корень корпуса ТЗ")
     args = parser.parse_args()
 
