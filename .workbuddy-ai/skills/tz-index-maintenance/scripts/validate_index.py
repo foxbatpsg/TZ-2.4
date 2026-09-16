@@ -54,9 +54,11 @@ GATE_MENTION = re.compile(r"\b(G-\d{2})\b")
 # Порог: норма, у которой больше одного определения, требует явного canonical
 MULTI_DEFINITION_WARN = 2
 
-# Идентификаторы, отсутствующие в корпусе намеренно (задокументированный пропуск
-# нумерации). Помечаются в INDEX.md значением `status: gap`. Не считаются ошибкой.
-ALLOWED_GAPS = {"Q-06", "Q-07"}
+# Настоящие намеренные пропуски: допуск требует строки реестра `status: gap`.
+ALLOWED_GAPS: set[str] = set()
+# Открытые вопросы без утверждённого определения — не пропуски нумерации.
+# Допуск действует только при отдельной строке `status: open` в INDEX.md §4.
+OPEN_QUESTIONS = {"Q-06", "Q-07"}
 
 
 def read(path: Path) -> str:
@@ -104,6 +106,43 @@ def collect_gates(root: Path) -> dict[str, set[str]]:
 def extract_index_norms(index_text: str) -> set[str]:
     """Извлекает нормы, заявленные в реестре INDEX.md."""
     return set(REQ_MENTION.findall(index_text))
+
+
+def collect_index_exceptions(
+    index_text: str, definitions: dict[str, list[str]], mentions: set[str]
+) -> tuple[set[str], set[str], list[str]]:
+    """Допускает отсутствие нормы только по согласованной строке реестра §4."""
+    rows: dict[str, list[str]] = defaultdict(list)
+    in_registry = False
+    for line in index_text.splitlines():
+        if line.startswith("## "):
+            in_registry = line.startswith("## 4. ")
+        if not in_registry:
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if not line.startswith("|") or len(cells) != 5:
+            continue
+        match = re.fullmatch(r"\*\*(Q-\d{2})\*\*", cells[0])
+        if match:
+            rows[match.group(1)].append(cells[4])
+
+    opened: set[str] = set()
+    gaps: set[str] = set()
+    problems: list[str] = []
+    for norm in sorted(OPEN_QUESTIONS | ALLOWED_GAPS):
+        if norm in OPEN_QUESTIONS and norm in ALLOWED_GAPS:
+            problems.append(f"{norm}: одновременно открытый вопрос и пропуск")
+            continue
+        status = "open" if norm in OPEN_QUESTIONS else "gap"
+        entries = rows.get(norm, [])
+        if len(entries) != 1 or re.findall(r"`status: ([a-z]+)`", entries[0]) != [status]:
+            problems.append(f"{norm}: нужна одна строка реестра §4 с `status: {status}`")
+            continue
+        if norm in definitions or (status == "gap" and norm in mentions):
+            problems.append(f"{norm}: статус {status} противоречит нормативному корпусу")
+            continue
+        (opened if status == "open" else gaps).add(norm)
+    return opened, gaps, problems
 
 
 def extract_index_gates(index_text: str) -> set[str]:
@@ -170,15 +209,22 @@ def main() -> int:
 
     # --- 3. Обратная полнота ---
     print("\n[3] Обратная полнота (нормы индекса против корпуса)")
-    phantom = sorted(index_norms - mentions - ALLOWED_GAPS)
+    opened, declared_gaps, status_problems = collect_index_exceptions(
+        index_text, definitions, mentions
+    )
+    errors.extend(status_problems)
+    for problem in status_problems:
+        print(f"  ✗ {problem}")
+    phantom = sorted(index_norms - mentions - opened - declared_gaps)
     if phantom:
         errors.append(f"Нормы объявлены в INDEX.md, но не встречаются в корпусе: {phantom}")
         print(f"  ✗ фантомные записи: {', '.join(phantom)}")
-    else:
-        print("  ✓ в индексе нет норм, отсутствующих в корпусе")
-    declared_gaps = sorted((index_norms - mentions) & ALLOWED_GAPS)
+    elif not status_problems:
+        print("  ✓ нет необъяснённых записей вне нормативного корпуса")
+    if opened:
+        print(f"  · открытые вопросы без утверждённого определения: {', '.join(sorted(opened))}")
     if declared_gaps:
-        print(f"  · задокументированный пропуск нумерации: {', '.join(declared_gaps)}")
+        print(f"  · задокументированный пропуск нумерации: {', '.join(sorted(declared_gaps))}")
 
     # --- 4. Дубли определений ---
     print("\n[4] Нормы с дублирующимися определениями (требуют canonical)")
@@ -201,13 +247,13 @@ def main() -> int:
 
     # --- 5. Нормы без определения ---
     print("\n[5] Нормы без канонического определения")
-    undefined = sorted(n for n in mentions if n not in definitions)
+    undefined = sorted(n for n in mentions if n not in definitions and n not in opened)
     if undefined:
         for norm in undefined:
             print(f"  ⚠ {norm}: определение не найдено (проверить, дефект ли это ревизии)")
         warnings.append(f"Без определения: {', '.join(undefined)}")
     else:
-        print("  ✓ у каждой нормы есть определение")
+        print("  ✓ у каждой действующей нормы есть определение; открытые вопросы учтены в [3]")
 
     # --- 6. Gate ---
     print("\n[6] Покрытие Gate")
