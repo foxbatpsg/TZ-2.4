@@ -72,17 +72,17 @@ class StatusTests(unittest.TestCase):
                 self.assertTrue(errors)
 
     def test_real_corpus_cli_positive_and_negative(self):
-        # Реальный корпус: действует штатный OPEN_QUESTIONS = {"Q-07"} (Q-06 закрыт).
+        # Реальный корпус: штатный OPEN_QUESTIONS пуст (Q-06 и Q-07 закрыты 2026-09-16).
         original = (ROOT / "INDEX.md").read_text(encoding="utf-8")
         variants = [
             (original, 0),
-            (original.replace("`status: open`", "`status: gap`", 1), 1),
             ("\n".join(line for line in original.splitlines()
-                       if not line.startswith("| **Q-07** |")), 1),
+                       if not line.startswith("| **Q-07** |")), 0),
             (original + "\nФантом Q-99\n", 1),
         ]
         # Копируются только перечисленные нормативные файлы, не архив и не карточки.
-        with patch.object(validator, "OPEN_QUESTIONS", {"Q-07"}), \
+        # Штатный OPEN_QUESTIONS пуст — переопределяем патч класса setUp().
+        with patch.object(validator, "OPEN_QUESTIONS", set()), \
              tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for rel in validator.CORPUS_FILES + validator.APPENDIX_FILES:
@@ -100,9 +100,23 @@ class StatusTests(unittest.TestCase):
                             result = validator.main()
                         self.assertEqual(result, expected, output.getvalue())
                         if expected == 0:
-                            self.assertIn("PASS — предупреждений 0", output.getvalue())
-                            self.assertIn("открытые вопросы без утверждённого определения", output.getvalue())
-                            self.assertNotIn("задокументированный пропуск нумерации:", output.getvalue())
+                            self.assertIn("РЕЗУЛЬТАТ: PASS", output.getvalue())
+        # Регрессия формата: открытый вопрос требует строки §4 с `status: open`.
+        with patch.object(validator, "OPEN_QUESTIONS", {"Q-07"}), \
+             tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for rel in validator.CORPUS_FILES + validator.APPENDIX_FILES:
+                target = root / rel
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((ROOT / rel).read_bytes())
+            with patch.object(validator, "check_index_files_exist", return_value=[]), \
+                 patch.object(validator.sys, "argv", [str(SCRIPT), "--root", directory]):
+                (root / "INDEX.md").write_text(original, encoding="utf-8")
+                output = io.StringIO()
+                with contextlib.redirect_stdout(output):
+                    result = validator.main()
+                self.assertEqual(result, 1, output.getvalue())
+                self.assertIn("Q-07: нужна одна строка реестра §4", output.getvalue())
 
 
 if __name__ == "__main__":

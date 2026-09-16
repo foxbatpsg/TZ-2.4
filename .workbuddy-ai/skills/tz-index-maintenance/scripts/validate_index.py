@@ -58,7 +58,7 @@ MULTI_DEFINITION_WARN = 2
 ALLOWED_GAPS: set[str] = set()
 # Открытые вопросы без утверждённого определения — не пропуски нумерации.
 # Допуск действует только при отдельной строке `status: open` в INDEX.md §4.
-OPEN_QUESTIONS = {"Q-07"}
+OPEN_QUESTIONS = set()
 
 
 def read(path: Path) -> str:

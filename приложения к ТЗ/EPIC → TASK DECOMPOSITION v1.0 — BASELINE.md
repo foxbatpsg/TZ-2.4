@@ -2,7 +2,7 @@
 
 **Проект:** Research Prompt Suite  
 **Статус:** Draft for TASK generation  
-**Основание:** ТЗ v2.6 + УИ v1.0 (A-01…A-21, Q-01…Q-05); State Machine Specification v1.2; BUDGET CONTRACT v1.0; MCP Tool Contracts v1.1 (до выпуска v1.2); MASTER DEVELOPMENT ROADMAP; EPIC SPECIFICATIONS v1.0 — BASELINE; TASK EXECUTION CONTRACT v1.0 — BASELINE.
+**Основание:** ТЗ v2.7 + УИ v1.0 (A-01…A-21, Q-01…Q-05); State Machine Specification v1.2; BUDGET CONTRACT v1.0; MCP Tool Contracts v1.1 (до выпуска v1.2); MASTER DEVELOPMENT ROADMAP; EPIC SPECIFICATIONS v1.0 — BASELINE; TASK EXECUTION CONTRACT v1.0 — BASELINE.
 
 # 1. Назначение
 

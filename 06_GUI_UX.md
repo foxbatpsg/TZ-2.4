@@ -1,5 +1,5 @@
 
-# Раздел 6.Research Prompt Suite — GUI и UX v2.6
+# Раздел 6.Research Prompt Suite — GUI и UX v2.7
 
 **Статус:** нормативная спецификация
 

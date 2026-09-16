@@ -1,7 +1,7 @@
 ---
 # MCP TOOL CONTRACTS v1.1
 
-**Статус:** Нормативное приложение к ТЗ v2.6
+**Статус:** Нормативное приложение к ТЗ v2.7
 **Назначение:** Детальные контракты 23 MCP-инструментов MVP.  
 **Приоритет:** Этот документ уточняет и заменяет неоднозначные места версии v1.0.
 
@@ -156,7 +156,7 @@ CREATED → VALIDATING → QUEUED → RUNNING
 | Поле | Контракт |
 |---|---|
 | INPUT | `study_id`, `file_ref`, `document_type` |
-| OUTPUT | `document_id`, `title`, `content_length`, `chunks_count`, `status`, `operation_id` |
+| OUTPUT | `document_id`, `title`, `content_length`, `chunks_count`, `status`, `task_id`, `operation_id` |
 | ERRORS | `INVALID_INPUT`, `PARSE_ERROR`, `UNSUPPORTED_FORMAT`, `CONTENT_TOO_LARGE`, `DATABASE_ERROR` |
 | LIMITS | default 20 MiB |
 | TIMEOUT | 120 с |
@@ -167,6 +167,8 @@ CREATED → VALIDATING → QUEUED → RUNNING
 | AUTHORITY | пользователь/GUI выбирает файл; Core разрешает, читает и сохраняет |
 
 `file_ref` должен указывать на заранее зарегистрированный Core-approved файл. Передача LLM произвольного `C:\...` пути запрещена.
+
+Локальная аналитическая задача (`Q-07`, `03` §6a): Core при импорте создаёт идемпотентно `SearchTask` с `purpose = local_analysis` и возвращает её `task_id`; локальные Evidence получают настоящий `task_id`, фиктивные URL/DOI/PMID запрещены (A-17).
 
 ### `search_within_document`
 
@@ -228,6 +230,8 @@ CREATED → VALIDATING → QUEUED → RUNNING
 `EVIDENCE`, `OBSERVATION`, `CLAIM`, `CONTRADICTION`, `GAP`.
 
 `save_study_material` не используется как механизм передачи полного контекста доказательства: лимит 4 KiB — ограничение payload сохраняемой сущности (`Q-06`, `05` §4b, п. 3).
+
+Для локальных Evidence `task_id` резервируется Core из задачи `local_analysis` документа (`Q-07`, `03` §6a): LLM не подставляет идентификатор задачи самостоятельно.
 
 ### `search_study_materials`
 
