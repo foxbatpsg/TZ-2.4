@@ -1,14 +1,14 @@
 ---
 name: tz-index-maintenance
-description: "This skill should be used when modifying the normative corpus of the Research Prompt Suite technical specification (TZ v2.5) — files 01–07, the appendices in «приложения к ТЗ», ARCHITECTURE.md, INDEX.md or REVIEW-REGISTRY.md. Trigger on any edit, addition, renumbering or review of TZ requirements, or when a requirement must be located, a conflict between norms checked, or a change impact assessed. Also trigger when writing a new TASK card, so that the task references requirements by normative ID rather than by section number."
+description: "This skill should be used when modifying the normative corpus of the Research Prompt Suite technical specification (TZ v2.7) — files 01–07, the appendices in «приложения к ТЗ», ARCHITECTURE.md, INDEX.md or REVIEW-REGISTRY.md. Trigger on any edit, addition, renumbering or review of TZ requirements, or when a requirement must be located, a conflict between norms checked, or a change impact assessed. Also trigger when writing a new TASK card, so that the task references requirements by normative ID rather than by section number."
 agent_created: true
 ---
 
-# Обслуживание индексного слоя ТЗ v2.5
+# Обслуживание индексного слоя ТЗ v2.7
 
 ## Назначение
 
-Управление нормативным корпусом ТЗ v2.5 «Research Prompt Suite» (~340 КБ, 14 файлов) через
+Управление нормативным корпусом ТЗ v2.7 «Research Prompt Suite» (~340 КБ, 14 файлов) через
 навигационный слой `INDEX.md`. Индекс существует по одной причине: **корпус достиг объёма, при
 котором последовательное чтение неприемлемо**, а адресный поиск без карты приводит к ошибкам —
 именно так возник дефект, где ревьюер объявил EPIC-07…11 «отсутствующими», хотя они есть в
@@ -224,7 +224,7 @@ A-01…A-21»), но **самого реестра** — раздела, кот�
 Правка здесь не «внести формулировку», а «создать место, где набор становится разрешимым».
 
 **Шаг 1. Определить место по §19 «Нормативные источники».** Это решающий критерий. Раздел §19
-`MASTER ROADMAP` задаёт ранжированный список: (1) ТЗ v2.5 + утверждённые изменения, (2) FSM
+`MASTER ROADMAP` задаёт ранжированный список: (1) ТЗ v2.7 + утверждённые изменения, (2) FSM
 Spec, (3) BUDGET CONTRACT, (4) MCP Tool Contracts, (5) EPIC-документ этапа, (6) TASK, (7) код.
 Правило: **новый реестр живёт на том уровне, который назначен ему в §19, и в документе,
 который уже определяет нормы этого уровня.**

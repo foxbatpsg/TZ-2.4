@@ -1,13 +1,13 @@
 # ARCHITECTURE.md — Research Prompt Suite
 
-**Источник контекста:** ТЗ v2.5 (репозиторий `foxbatpsg/TZ-2.4`, ветка `master`), включая нормативные приложения `STATE MACHINE SPECIFICATION v1.2`, `BUDGET CONTRACT v1.0`, `MCP TOOL CONTRACTS v1.1`, `EPIC SPECIFICATIONS v1.0`, `EPIC → TASK DECOMPOSITION v1.0`, `MASTER DEVELOPMENT ROADMAP v1.2`, `TASK EXECUTION CONTRACT v1.0`.
+**Источник контекста:** ТЗ v2.7 (репозиторий `foxbatpsg/TZ-2.4`, ветка `master`), включая нормативные приложения `STATE MACHINE SPECIFICATION v1.2`, `BUDGET CONTRACT v1.0`, `MCP TOOL CONTRACTS v1.1`, `EPIC SPECIFICATIONS v1.0`, `EPIC → TASK DECOMPOSITION v1.0`, `MASTER DEVELOPMENT ROADMAP v1.2`, `TASK EXECUTION CONTRACT v1.0`.
 
 **Статус документа:** рабочий архитектурный ориентир для декомпозиции задач между ИИ-агентами (Cline / OpenCode). Документ не заменяет ТЗ и нормативные приложения — при конфликте приоритет имеет ТЗ.
 
 **Иерархия приоритета документов:**
 
 ```
-ТЗ v2.5
+ТЗ v2.7
   ↓
 State Machine Specification v1.2 / MCP Tool Contracts v1.1 / Budget Contract v1.0
   ↓
@@ -187,7 +187,7 @@ research-prompt-suite/
 ├── packaging/                          # Сборка portable-дистрибутива Windows (PyInstaller)
 │
 ├── docs/                               # Нормативные документы проекта
-│   ├── tz/                             # Копия/ссылка на разделы 01–07 ТЗ v2.5
+│   ├── tz/                             # Копия/ссылка на разделы 01–07 ТЗ v2.7
 │   ├── contracts/                      # STATE MACHINE SPEC, MCP TOOL CONTRACTS, BUDGET CONTRACT, TASK EXECUTION CONTRACT
 │   ├── adr/                            # Architecture Decision Records (см. `INDEX.md` §7, `REVIEW-REGISTRY.md`)
 │   └── ARCHITECTURE.md                 # Этот документ (каноническая копия)
