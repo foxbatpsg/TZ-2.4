@@ -2,6 +2,13 @@
 """
 Валидатор целостности индексного слоя ТЗ v2.5.
 
+ВНИМАНИЕ (2026-10-02): задача FU-4 / Гл.0-01 вариант 3 (включение `приложения к ТЗ/Epic/`
+в область индексации и таблица соответствия `E0X-C0Y` ↔ `E0X-T0Y` в `INDEX.md` §11)
+ОТЛОЖЕНА владельцем (VERDICTS §3). Пока §11 в INDEX.md отсутствует, блок [7]
+«TASK-карточки» выдаёт ПРЕДУПРЕЖДЕНИЕ (не ошибку) — это ОЖИДАЕМОЕ поведение, а не
+дефект корпуса. На этот пункт при проверке внимание не тратить; проверят его только
+после возобновления FU-4.
+
 Проверяет:
   1. Битые ссылки: все упомянутые в INDEX.md разделы/§ существуют в файлах ТЗ.
   2. Полнота реестра норм: все A-xx и Q-xx, найденные в корпусе, присутствуют в INDEX.md.
@@ -44,12 +51,36 @@ APPENDIX_FILES = [
     "приложения к ТЗ/TASK EXECUTION CONTRACT v1.0 — BASELINE.md",
 ]
 
+# TASK-карточки Astra1 (слой E0X-C0Y) — входят в область индексации (см. FU-4).
+CARD_FILES = [
+    "приложения к ТЗ/Epic/Глава_1_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_2_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_3_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_4_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_5_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_6_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_7_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_8_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_9_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_10_Карточки.md",
+    "приложения к ТЗ/Epic/Глава_11_Карточки.md",
+]
+
+# Объединённый набор файлов, входящих в область индекса
+INDEXED_FILES = CORPUS_FILES + APPENDIX_FILES + CARD_FILES
+
 # Формат нормативного определения в ТЗ: "Название нормы (A-N): текст"
 REQ_DEFINITION = re.compile(r"[«\w].{2,90}?\(([AQ]-\d{2})\)\s*:")
 # Любое упоминание идентификатора нормы
 REQ_MENTION = re.compile(r"\b([AQ]-\d{2})\b")
 # Gate
 GATE_MENTION = re.compile(r"\b(G-\d{2})\b")
+# Идентификатор TASK-карточки: E01-C01, E10-C03a
+CARD_ID = re.compile(r"^##\s*(E\d{2}-C\d+[a-z]?)\s*$", re.MULTILINE)
+# TASK-карточка внутри таблицы покрытия INDEX.md §11
+CARD_ID_TOKEN = re.compile(r"\bE\d{2}-C\d+[a-z]?\b")
+# Явный идентификатор задачи декомпозиции: E01-T01, E10-T15a
+TASK_ID = re.compile(r"\b(E\d{2}-T\d{2}[a-z]?)\b")
 
 # Порог: норма, у которой больше одного определения, требует явного canonical
 MULTI_DEFINITION_WARN = 2
@@ -72,7 +103,7 @@ def read(path: Path) -> str:
 def collect_definitions(root: Path) -> dict[str, list[str]]:
     """Собирает, в каких файлах каждая норма определена (а не просто упомянута)."""
     definitions: dict[str, list[str]] = defaultdict(list)
-    for rel in CORPUS_FILES + APPENDIX_FILES:
+    for rel in INDEXED_FILES:
         path = root / rel
         if not path.exists():
             continue
@@ -83,9 +114,9 @@ def collect_definitions(root: Path) -> dict[str, list[str]]:
 
 
 def collect_mentions(root: Path) -> set[str]:
-    """Собирает все идентификаторы норм, встречающиеся в корпусе."""
+    """Собирает все идентификаторы норм, встречающиеся в корпусе (включая карточки)."""
     found: set[str] = set()
-    for rel in CORPUS_FILES + APPENDIX_FILES:
+    for rel in INDEXED_FILES:
         path = root / rel
         if path.exists():
             found.update(REQ_MENTION.findall(read(path)))
@@ -93,14 +124,56 @@ def collect_mentions(root: Path) -> set[str]:
 
 
 def collect_gates(root: Path) -> dict[str, set[str]]:
-    """Собирает Gate по файлам."""
+    """Собирает Gate по файлам (включая карточки)."""
     gates: dict[str, set[str]] = defaultdict(set)
-    for rel in CORPUS_FILES + APPENDIX_FILES:
+    for rel in INDEXED_FILES:
         path = root / rel
         if path.exists():
             for gate in GATE_MENTION.findall(read(path)):
                 gates[gate].add(rel)
     return gates
+
+
+def collect_card_ids(root: Path) -> set[str]:
+    """Собирает все TASK-карточки `E0X-C0Y` в файлах `Epic/Глава_*_Карточки.md`."""
+    cards: set[str] = set()
+    for rel in CARD_FILES:
+        path = root / rel
+        if path.exists():
+            cards.update(CARD_ID.findall(read(path)))
+    return cards
+
+
+def collect_task_ids(root: Path) -> set[str]:
+    """Собирает все TASK `E0X-T0Y` из нормативной декомпозиции."""
+    rel = "приложения к ТЗ/EPIC → TASK DECOMPOSITION v1.0 — BASELINE.md"
+    path = root / rel
+    if not path.exists():
+        return set()
+    return set(TASK_ID.findall(read(path)))
+
+
+def extract_index_card_rows(index_text: str) -> set[str]:
+    """Извлекает идентификаторы карточек `E0X-C0Y`, перечисленные в INDEX.md §11.
+
+    Карточки в §11 перечислены в таблице покрытия (первый столбец) — каждая
+    строка таблицы начинается с `` E01-C01 `` и т.п. Сканируем весь текст
+    §11 по токену ``CARD_ID_TOKEN``, чтобы не зависеть от разметки заголовков.
+    """
+    # находим блок §11
+    start = index_text.find("## 11")
+    if start == -1:
+        return set()
+    # §11 заканчивается либо следующим заголовком ##, либо концом файла
+    end = index_text.find("\n## ", start + 5)
+    if end == -1:
+        end = len(index_text)
+    section_text = index_text[start:end]
+    return set(CARD_ID_TOKEN.findall(section_text))
+    return set(CARD_ID.findall(index_text))
+
+
+
 
 
 def extract_index_norms(index_text: str) -> set[str]:
@@ -268,6 +341,52 @@ def main() -> int:
         extra = sorted(index_gates - corpus_gates)
         warnings.append(f"В индексе есть Gate, отсутствующие в корпусе: {extra}")
         print(f"  ⚠ лишние Gate в индексе: {', '.join(extra)}")
+
+    # --- 7. TASK-карточки (E0X-C0Y) ---
+    print("\n[7] Покрытие TASK-карточек Astra1 (область индекса)")
+    card_set = collect_card_ids(root)
+    index_cards = extract_index_card_rows(index_text)
+    missing_cards = sorted(card_set - index_cards)
+    phantom_cards = sorted(index_cards - card_set)
+    if missing_cards:
+        warnings.append(
+            f"TASK-карточки есть в корпусе, но отсутствуют в INDEX.md §11 и этот пункт"
+            f" ОТЛОЖЕН владельцем (FU-4, 2026-10-02): на предупреждение не реагировать: {len(missing_cards)}"
+        )
+        print(f"  ⚠ не попали в индекс ({len(missing_cards)}): {', '.join(missing_cards)}")
+        print("  ⚠ ОЖИДАЕМО: FU-4 отложена владельцем — на этот пункт внимание не тратить")
+    else:
+        print(f"  ✓ все {len(card_set)} карточек `E0X-C0Y` присутствуют в INDEX.md §11")
+    if phantom_cards:
+        errors.append(f"INDEX.md §11 ссылается на несуществующие карточки: {phantom_cards}")
+        print(f"  ✗ фантомные карточки в индексе: {', '.join(phantom_cards)}")
+    # проверка существования файлов карточек
+    missing_card_files = [rel for rel in CARD_FILES if not (root / rel).exists()]
+    if missing_card_files:
+        errors.append(f"Файлы карточек недоступны: {missing_card_files}")
+    # нормативные ссылки из карточек должны быть в реестре (A-xx/Q-xx)
+    card_files_text = "\n".join(read(root / rel) for rel in CARD_FILES if (root / rel).exists())
+    card_norm_refs = set(REQ_MENTION.findall(card_files_text))
+    dangling_refs = sorted(card_norm_refs - mentions)
+    if dangling_refs:
+        warnings.append(f"Карточки ссылаются на нормы, отсутствующие в корпусе: {dangling_refs}")
+        print(f"  ⚠ карточки ссылаются на несуществующие нормы: {', '.join(dangling_refs)}")
+    else:
+        print(f"  ✓ ссылки карточек на нормы ({len(card_norm_refs)}) разрешаются реестром")
+
+    # --- 8. Явные TASK-ссылки из карточек (E0X-T0Y) ---
+    print("\n[8] TASK-ссылки из карточек (E0X-T0Y)")
+    task_set = collect_task_ids(root)
+    card_task_refs = set(TASK_ID.findall(card_files_text))
+    dangling_tasks = sorted(card_task_refs - task_set)
+    if card_task_refs:
+        if dangling_tasks:
+            errors.append(f"Карточки ссылаются на TASK, отсутствующие в декомпозиции: {dangling_tasks}")
+            print(f"  ✗ не разрешаются: {', '.join(dangling_tasks)}")
+        else:
+            print(f"  ✓ все {len(card_task_refs)} явных TASK-идентификатора в карточках найдены в декомпозиции")
+    else:
+        print("  · в карточках нет явных ссылок на TASK E0X-T0Y")
 
     # --- Итог ---
     print("\n" + "=" * 62)
