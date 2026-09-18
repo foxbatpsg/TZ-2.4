@@ -428,15 +428,17 @@ Job-механизм определён Search Core и применяется т
 ### `cancel_job`
 
 `INPUT: job_id`  
-`OUTPUT: CANCEL_REQUESTED|ALREADY_COMPLETED|ALREADY_CANCELLED|NOT_FOUND`  
+`OUTPUT: CANCEL_REQUESTED|ALREADY_COMPLETED|ALREADY_CANCELLED|ALREADY_TERMINATED|NOT_FOUND`  
 `ERRORS: INVALID_INPUT, DATABASE_ERROR`  
 `LIMITS: 1 KiB`  
 `TIMEOUT: 5 с`  
 `RETRY: повтор допустим и должен быть идемпотентным`  
 `SIDE EFFECTS: установка cooperative cancellation flag; фактический переход Job → CANCELLED выполняет Job runner/Core`  
-`IDEMPOTENCY: повтор после отмены → ALREADY_CANCELLED`  
+`IDEMPOTENCY: повтор после отмены → ALREADY_CANCELLED; повтор для терминального FAILED → ALREADY_TERMINATED`  
 `CANCELLATION: сам является cancellation command`  
 `AUTHORITY: пользователь/LLM инициирует; Core выполняет`
+
+Семантика исходов по состояниям Job (FSM v1.2 §6): `QUEUED`/`RUNNING` → `CANCEL_REQUESTED` (для `QUEUED` runner снимает задачу до старта, переход `QUEUED → CANCELLED`); `COMPLETED` → `ALREADY_COMPLETED`; `CANCELLED` → `ALREADY_CANCELLED`; `FAILED` → `ALREADY_TERMINATED`.
 
 `cancel_job` не имеет права напрямую присваивать `Job.status = CANCELLED`, если Job runner ещё не подтвердил безопасную отмену.
 

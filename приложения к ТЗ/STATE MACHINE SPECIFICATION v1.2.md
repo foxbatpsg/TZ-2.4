@@ -269,10 +269,11 @@ Job-механизм определён в Search Core и применяется
 ### Переходы
 
 `QUEUED → RUNNING → COMPLETED | FAILED | CANCELLED`.
+`QUEUED → CANCELLED` (`CANCEL` — runner снимает задачу до старта; симметрично SearchTask §3).
 
 `cancel_job` сначала устанавливает cancellation request. Фактический переход в `CANCELLED` выполняет runner после безопасной точки и commit checkpoint. Кооперативная отмена не блокирует MCP transport.
 
-При аварийном завершении незавершённый Job переводится Core в `FAILED`, если механизм восстановления не может безопасно продолжить его.
+При аварийном завершении незавершённый Job переводится Core в `FAILED`, если механизм восстановления не может безопасно продолжить его. `COMPLETED`, `FAILED` и `CANCELLED` — терминальные состояния: команда `CANCEL` не изменяет состояние терминального Job; `cancel_job` возвращает соответствующий терминальный исход (`MCP TOOL CONTRACTS v1.1`: `ALREADY_COMPLETED`, `ALREADY_CANCELLED`, `ALREADY_TERMINATED`).
 
 ---
 
