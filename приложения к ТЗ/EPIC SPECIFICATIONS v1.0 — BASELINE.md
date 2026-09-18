@@ -107,8 +107,8 @@ Durability (`A-11`): `synchronous=FULL` для записи, `foreign_keys=ON` �
 4. Deduplication: URL, DOI, PMID, arXiv, content hash, near-duplicate, SourceRelation.
 5. Query Fingerprint: normalization, `query_fingerprint`, многофакторная защита повторных/семантически одинаковых запросов, интеграция с budget и ResearchGap.
 6. Fetch/parse/chunk: heading_path, overlap, overlap_group_id, is_overlap, numeric signatures.
-7. SQLite FTS5/BM25, study/document isolation.
-8. BM25 index lifecycle: `normalizer_version`, `index_version`, `language`, `stopword_version`; document added → index; normalizer changed → rebuild_all; study deleted → cleanup.
+7. SQLite FTS5/BM25, study/document isolation (A-24).
+8. BM25 index lifecycle: `normalizer_version`, `index_version`, `language`, `stopword_version`; document added → index; normalizer changed → rebuild_all; study deleted → cleanup (A-24).
 9. Evidence: evidence_hash, target/context distinction, provenance.
 10. Cache: key, TTL, hit/miss, cleanup, diagnostics.
 11. Budget: time, network, LLM/tool calls, atomic deduction.
@@ -120,12 +120,12 @@ Durability (`A-11`): `synchronous=FULL` для записи, `foreign_keys=ON` �
 RetrievalTextNormalizer
         │
         ├── BasicNormalizer
-        └── RussianMorphologyNormalizer
+        └── RussianMorphologyNormalizer (A-25)
 ```
 
 Поисковый запрос и индексируемый текст проходят через согласованный normalizer.
 
-**Gate G-04:** retrieval детерминирован; deduplication и query fingerprint работают; FTS5/BM25 согласован с DocumentChunk; lifecycle индекса корректен; evidence provenance, budget, cache и normalizer versioning работают.
+**Gate G-04:** retrieval детерминирован; deduplication и query fingerprint работают; FTS5/BM25 согласован с DocumentChunk; lifecycle индекса корректен (A-24); evidence provenance, budget, cache и normalizer versioning работают; русская морфология проверяется по A-13/A-25.
 
 Граница ответственности (`A-16`): EPIC-04 предоставляет чистые типизированные primitives (coverage, sufficiency, budget); второй evaluator в других эпиках не реализуется. G-04 проверяется на fixtures без реальной LLM.
 
@@ -153,7 +153,7 @@ Core владеет task acceptance, duplicate/similar query checks, budget, cov
 
 **Dependencies:** EPIC-01, EPIC-03. EPIC-05 не является обязательной зависимостью для начала разработки.
 
-**Scope:** LLMProvider, LM Studio adapter, Ollama adapter, configuration, health monitor, timeout, degraded/unreachable/restart, backend switching, structured output, JSON Schema validation, constrained decoding/grammar, controlled repair fallback, TokenBudgetManager, context budget, prompt construction.
+**Scope:** LLMProvider, LM Studio adapter, Ollama adapter, configuration, health monitor, timeout, degraded/unreachable/restart, backend switching, structured output, JSON Schema validation, constrained decoding/grammar, controlled repair fallback, TokenBudgetManager, context budget, prompt construction; целевой класс модели — 12–14B (A-22).
 
 **Structured output:** constrained decoding → strict schema validation → semantic/contract validation → accepted result. Если grammar недоступна — limited repair + re-validation + retry/failure.
 
@@ -161,7 +161,7 @@ Core владеет task acceptance, duplicate/similar query checks, budget, cov
 
 Сырые HTML, полные страницы и длинные логи не передаются LLM; Core формирует компактный context.
 
-**Gate G-06:** unreachable, timeout, invalid/truncated JSON, degraded response, restart, backend switch, context budget, schema/semantic validation, constrained decoding, repair fallback и state preservation проходят тесты.
+**Gate G-06:** unreachable, timeout, invalid/truncated JSON, degraded response, restart, backend switch, context budget, schema/semantic validation, constrained decoding, repair fallback и state preservation проходят тесты; результат не выдаётся за производительность целевой модели 12–14B (A-22).
 
 ---
 
@@ -225,7 +225,7 @@ GUI → Application/Core → Research Engine → MCP/LLM → Search Core → Dat
 
 **Levels:** Unit → Component → Integration → FSM → MCP Contract → E2E → Failure Scenarios → Acceptance.
 
-**Coverage:** data isolation, BM25, RetrievalTextNormalizer, Russian morphology (обязательна для MVP, A-13; Acceptance морфологии — обязательный критерий G-10), deterministic chunking, overlap protection, FTS5/index consistency, normalizer/index versioning, query fingerprint, evidence_hash, aggregation, claims, contradictions, primary source, context protection, LLM resilience, two-level structured output validation, GUI responsiveness, cooperative cancellation, project switching, network resilience, security, MATERIALS_ONLY, offline, CPU-only MVP.
+**Coverage:** data isolation, BM25 (A-24), RetrievalTextNormalizer, Russian morphology (обязательна для MVP, A-13; Acceptance морфологии — обязательный критерий G-10, нормативная реализация — A-25), deterministic chunking, overlap protection, FTS5/index consistency (A-24), normalizer/index versioning (A-24), query fingerprint, evidence_hash, aggregation, claims, contradictions, primary source, context protection, LLM resilience, two-level structured output validation, GUI responsiveness, cooperative cancellation, project switching, network resilience, security, MATERIALS_ONLY, offline, CPU-only MVP. Post-MVP: embedding-ready схема (A-23) — вне MVP.
 
 **Gate G-10:** все обязательные критерии ТЗ выполнены; критических известных дефектов нет.
 

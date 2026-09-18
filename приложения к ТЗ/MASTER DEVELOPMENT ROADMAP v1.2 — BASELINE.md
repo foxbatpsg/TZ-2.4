@@ -216,7 +216,7 @@ DocumentChunk / Document / Study
 4. Deduplication: URL, DOI, PMID, arXiv, content hash, near-duplicate, SourceRelation.
 5. Query Fingerprint & Loop Prevention: query normalization, `query_fingerprint`, многофакторная защита от повторных/семантически одинаковых запросов и интеграция с budget/ResearchGap.
 6. Fetch/parse/chunk: heading_path, overlap, overlap_group_id, is_overlap, numeric signatures.
-7. Local retrieval: SQLite FTS5/BM25, study/document isolation.
+7. Local retrieval: SQLite FTS5/BM25, study/document isolation (A-24).
 9. Evidence: evidence_hash, target/context distinction, provenance.
 11. Cache: key, TTL, hit/miss, cleanup, diagnostics.
 12. Budget: time, network, LLM/tool calls, atomic deduction.
@@ -247,7 +247,7 @@ RetrievalTextNormalizer
 
 Не следует фиксировать в Roadmap конкретный Python API или конкретный morphology engine до проверки совместимости с целевой SQLite/FTS5 реализацией.
 
-**Gate G-04:** проходит полный CPU-only pipeline
+**Gate G-04:** проходит полный CPU-only pipeline (A-24)
 
 ```text
 query → candidates → normalization → deduplication → fetch
@@ -257,10 +257,10 @@ query → candidates → normalization → deduplication → fetch
 без LLM и GUI.
 
 Дополнительно Gate должен подтверждать:
-- консистентность `DocumentChunk` ↔ retrieval index;
+- консистентность `DocumentChunk` ↔ retrieval index; lifecycle индекса согласно A-24;
 - deterministic retrieval;
 - isolation по Study/Document;
-- корректную работу выбранного tokenizer;
+- корректную работу выбранного tokenizer (A-25);
 - отсутствие обязательной зависимости от GPU/embeddings/vector DB.
 
 ---
@@ -292,7 +292,7 @@ A-16: Research Engine вызывает typed primitives EPIC-04 (coverage/suffic
 
 **Цель:** изолировать локальные LLM единым provider interface.
 
-**Включает:** LLMProvider, LM Studio/Ollama adapters, backend configuration, health monitor, timeout, degraded/unreachable/restart, switching, structured output, JSON Schema validation, constrained decoding / grammar-based structured generation, если поддерживается backend, controlled repair как fallback, TokenBudgetManager, context budget, prompt construction.
+**Включает:** LLMProvider, LM Studio/Ollama adapters, backend configuration, health monitor, timeout, degraded/unreachable/restart, switching, structured output, JSON Schema validation, constrained decoding / grammar-based structured generation, если поддерживается backend, controlled repair как fallback, TokenBudgetManager, context budget, prompt construction; целевой класс модели — 12–14B (A-22).
 
 ### Structured output policy
 
@@ -334,7 +334,7 @@ Post-hoc repair не является основным механизмом по
 
 Помимо schema validation проверяются обязательные ключевые данные, существование ссылок на Evidence/объекты, допустимые диапазоны, соответствие текущей операции и отсутствие очевидного обрыва/зацикливания. Формально валидный, но недопустимо пустой результат отклоняется. Проверка не определяет истинность утверждений.
 
-**Gate G-06:** unreachable, timeout, invalid/truncated JSON, degraded response, restart, backend switch, context budget, structured output validation, constrained decoding при наличии поддержки, controlled repair fallback и сохранение state проходят тесты.
+**Gate G-06:** unreachable, timeout, invalid/truncated JSON, degraded response, restart, backend switch, context budget, structured output validation, constrained decoding при наличии поддержки, controlled repair fallback и сохранение state проходят тесты; результат не выдаётся за производительность целевой модели 12–14B (A-22).
 
 ---
 
@@ -433,7 +433,7 @@ GUI → Application/Core → Research Engine → MCP/LLM → Search Core → Dat
 
 **Уровни:** Unit → Component → Integration → FSM → MCP Contract → E2E → Failure Scenarios → Acceptance.
 
-**Обязательные области:** data isolation, BM25, tokenizer, Russian morphology (обязательна для MVP — A-13; Acceptance морфологии — обязательный критерий G-10), deterministic chunking, overlap protection, FTS5/index consistency, evidence_hash, aggregation, claims, contradictions, primary source, context protection, LLM resilience, structured JSON validation, GUI responsiveness, cooperative cancellation, network resilience, security, MATERIALS_ONLY, offline, CPU-only.
+**Обязательные области:** data isolation, BM25 (A-24), tokenizer, Russian morphology (обязательна для MVP — A-13; Acceptance морфологии — обязательный критерий G-10, нормативная реализация — A-25), deterministic chunking, overlap protection, FTS5/index consistency (A-24), evidence_hash, aggregation, claims, contradictions, primary source, context protection, LLM resilience, structured JSON validation, GUI responsiveness, cooperative cancellation, network resilience, security, MATERIALS_ONLY, offline, CPU-only. Post-MVP: embedding-ready схема (A-23) — вне MVP.
 
 **Gate G-10:** все обязательные критерии Раздела 07 ТЗ выполнены; критических известных дефектов нет.
 

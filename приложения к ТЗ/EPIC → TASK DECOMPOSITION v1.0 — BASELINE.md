@@ -220,18 +220,18 @@ CODE / TEST / REVIEW
 
 ### Group R6 — Normalization / BM25
 
-* **E04-T25** — RetrievalTextNormalizer interface.
+* **E04-T25** — RetrievalTextNormalizer interface (A-25).
 * **E04-T26** — BasicNormalizer.
-* **E04-T27** — RussianMorphologyNormalizer/plugin boundary.
-* **E04-T28** — FTS5 schema/index representation.
+* **E04-T27** — RussianMorphologyNormalizer/plugin boundary (A-25).
+* **E04-T28** — FTS5 schema/index representation (A-24).
 * **E04-T29** — BM25 retrieval.
 * **E04-T30** — study/document isolation.
-* **E04-T31** — normalizer_version metadata.
+* **E04-T31** — normalizer_version metadata (A-24).
 * **E04-T32** — index_version/language/stopword_version metadata.
-* **E04-T33** — index lifecycle: document added.
-* **E04-T34** — index lifecycle: normalizer changed → rebuild_all.
+* **E04-T33** — index lifecycle: document added (A-24).
+* **E04-T34** — index lifecycle: normalizer changed → rebuild_all (A-24).
 * **E04-T35** — index lifecycle: study deleted → cleanup.
-* **E04-T36** — FTS5/BM25 consistency tests.
+* **E04-T36** — FTS5/BM25 consistency tests (A-24).
 
 ### Group R7 — Evidence
 
