@@ -536,6 +536,7 @@ CODE / TEST / REVIEW
 * **E10-T13** — cancellation scenario.
 * **E10-T14** — context protection scenario.
 * **E10-T15** — CPU-only MVP scenario.
+* **E10-T15a** — benchmark-spike (`S-13`): измерение recall/latency/memory по environment matrix; фиксация численных критериев Q-12 (TARGET → RESULT, `02` §5.3). ID добавлен решением владельца 2026-10-02 (ревизия claude5, Гл.10-02 в.2); `E10-T15a` не переиспользуется под другие цели.
 
 ### Group Q3 — Release readiness
 

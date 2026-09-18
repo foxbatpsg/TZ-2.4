@@ -200,7 +200,7 @@ python .workbuddy-ai/skills/tz-index-maintenance/scripts/validate_index.py
 | **G-07** | EPIC-07 MCP | Все 23 tools зарегистрированы, проходят contract tests | contract tests (`E07-T2x`) |
 | **G-08** | EPIC-08 GUI | Business rules не в GUI, workers, UI responsive, cancellation, project switching, offline, snapshot, evidence traceability | traceability view (`E08-T11`) |
 | **G-09** | EPIC-09 Integration & Resilience | Recovery не теряет валидные данные, не создаёт дубликаты, не нарушает FSM, сохраняет audit trail, восстанавливает session/job state | **fault injection**: crash после reserve |
-| **G-10** | EPIC-10 Final QA | Все обязательные критерии ТЗ, критических известных дефектов нет | golden-снапшоты; **adversarial fixtures** (`N-03`) |
+| **G-10** | EPIC-10 Final QA | Все обязательные критерии ТЗ, критических известных дефектов нет. Объём уточнён 2026-10-02: функциональная часть — `E10-C03`; производительная часть — `E10-C03a`, выполняется после benchmark-spike `S-13` (`E10-T15a`) | golden-снапшоты; **adversarial fixtures** (`N-03`) |
 | **G-11** | EPIC-11 Packaging/Portable | Запуск на целевой Windows без IDE + понятная диагностика отсутствующих компонентов | env-checker stubs; missing-dependency fixtures |
 
 ---
