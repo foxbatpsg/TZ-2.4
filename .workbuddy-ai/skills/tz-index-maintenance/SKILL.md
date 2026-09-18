@@ -1,6 +1,6 @@
 ---
 name: tz-index-maintenance
-description: "This skill should be used when modifying the normative corpus of the Research Prompt Suite technical specification (TZ v2.7) — files 01–07, the appendices in «приложения к ТЗ», ARCHITECTURE.md, INDEX.md or REVIEW-REGISTRY.md. Trigger on any edit, addition, renumbering or review of TZ requirements, or when a requirement must be located, a conflict between norms checked, or a change impact assessed. Also trigger when writing a new TASK card, so that the task references requirements by normative ID rather than by section number."
+description: "This skill should be used when modifying the normative corpus of the Research Prompt Suite technical specification (TZ v2.7) — files 01–07, the appendices in «приложения к ТЗ», ARCHITECTURE.md, INDEX.md or корзина/REVIEW-REGISTRY.md. Trigger on any edit, addition, renumbering or review of TZ requirements, or when a requirement must be located, a conflict between norms checked, or a change impact assessed. Also trigger when writing a new TASK card, so that the task references requirements by normative ID rather than by section number."
 agent_created: true
 ---
 
@@ -35,7 +35,7 @@ agent_created: true
 | Класс | Диапазон | Смысл |
 |---|---|---|
 | `A-01`…`A-21` | Архитектурные нормы | Утверждённые изменения (УИ) к ТЗ |
-| `Q-01`…`Q-13` | Решения по открытым вопросам | Все закрыты; `Q-06` — `05` §4b, `Q-07` — `03` §6a (утверждены и перенесены 2026-09-16). История — `REVIEW-REGISTRY.md` §8; блокировки по этим вопросам в карточках сняты коммитом `90ac226` |
+| `Q-01`…`Q-13` | Решения по открытым вопросам | Все закрыты; `Q-06` — `05` §4b, `Q-07` — `03` §6a (утверждены и перенесены 2026-09-16). История — `корзина/REVIEW-REGISTRY.md` §8; блокировки по этим вопросам в карточках сняты коммитом `90ac226` |
 | `G-01`…`G-11` | Gate приёмки | Определены в `EPIC SPECIFICATIONS` стр. 26–244 |
 
 **Формат нормативного определения в ТЗ единообразен:**
@@ -117,8 +117,8 @@ agent_created: true
    корпуса, хуже отсутствующего.
 4. **Не дублировать текст нормы в индексе.** Индекс хранит адрес и связи (`canonical`, `mentions`,
    `conflicts`, `gates`, `epics`), не формулировку.
-5. **Не разрешать противоречие самостоятельно.** При конфликте норм — зафиксировать в §9 и в
-   `REVIEW-REGISTRY.md`, затем `STOP → REPORT`.
+5. **Не разрешать противоречие самостоятельно.** При конфликте норм — зафиксировать в
+   `INDEX.md` §9 (реестр замечаний архивирован в `корзина/` 2026-09-18), затем `STOP → REPORT`.
 6. **Правки P0-блокеров** (`N-01` MCP-host, `S-12`/`Q-08` Document identity, `N-02` SourceRelation)
    вносить только после принятия соответствующего ADR. До этого зависимые TASK — `BLOCKED`.
 
@@ -151,7 +151,7 @@ Q-08 (2026-09-14) так возникли 11 дублей сразу в шест
    вставленный рядом.
 2. **Повтор внутри файла** — одинаковые длинные строки (>40 символов) в одном файле, где бы они ни
    стояли. **Обязательна:** вставка может встать **между** дублирующимися строками, и проверка
-   соседей её не увидит. Так в карточке `S-12` (`REVIEW-REGISTRY.md`) остался дубль строки
+   соседей её не увидит. Так в карточке `S-12` (`корзина/REVIEW-REGISTRY.md`) остался дубль строки
    «Зависимые блокировки», разделённый вставленной строкой «Резолюция».
 
 ```python
@@ -206,7 +206,8 @@ apply`. Рабочий способ: временно вернуть строк�
 1. **Поискать формулировку в старых файлах проекта** (проверенный приём, давший результат для A-01).
    Искать по названию нормы, её теме и по фрагментам применений — не только по идентификатору.
 2. Сверить найденный текст с применениями в корпусе: совпадают ли, нет ли противоречий.
-3. Если формулировка найдена — зафиксировать в `REVIEW-REGISTRY.md` §D-4 как `RESOLVED`, указав
+3. Если формулировка найдена — зафиксировать в `INDEX.md` §9 как `RESOLVED` (реестр
+   замечаний архивирован в `корзина/` 2026-09-18), указав
    диагноз (дефект миграции / утрата данных), потерянные составные части и требуемое действие.
 4. Если не найдена — пометить `status: defect` и представить на утверждение человеку.
 
